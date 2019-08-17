@@ -1,0 +1,440 @@
+---
+title: "loan prediction"
+output: html_document
+---
+
+
+```{r Import relevant packages}
+#Import relevant packages
+library(stats)
+library(psych) 
+```
+
+
+```{r loading dataset }
+#loading dataset
+setwd('E:/Documents/Reinp/GitHub Respositories/Loan_Prediction')
+ds_asses<-read.table('Data Science assessment.csv', header=TRUE,sep=",")
+ds_asses[,-13]  #Reads only the required columns in csv
+View(ds_asses)
+attach(ds_asses)
+```
+
+
+```{r summary statistics}
+#summary statistics
+names(ds_asses) #display variable names
+summary(ds_asses) #summarizes the dataset
+describe(ds_asses) 
+```
+
+
+```{r structure of data}
+#learn more about the dataset
+help(ds_asses)
+??ds_asses
+str(ds_asses)
+class(ds_asses)
+typeof(ds_asses) 
+length(ds_asses) 
+attributes(ds_asses) #names(ds_asses), class(ds_asses), row.names(ds_asses)
+```
+```{r distribution of input variables}
+#distribution of input variables
+table(ds_asses$LoanStatus360)
+table(ds_asses$CustomerGender)
+table(ds_asses$Product)
+table(ds_asses$Region)
+table(ds_asses$DailyRate)
+table(ds_asses$TotalPrice)
+table(ds_asses$Deposit)
+```
+
+```{r unique}
+#unique values per column
+unique(ds_asses$ DailyRate)
+unique(ds_asses$ TotalPrice)
+unique(ds_asses$ Deposit)
+unique(ds_asses$ TotalDays)
+```
+
+```{r contigency tables}
+# Distribution of LoanStatus360 accross input variables 
+tabLoanStatus360gender <- xtabs(~LoanStatus360+CustomerGender,data= ds_asses)
+tabLoanStatus360gender
+tabLoanStatus360product <- xtabs(~LoanStatus360+Product,data= ds_asses)
+tabLoanStatus360product
+tabLoanStatus360region <- xtabs(~LoanStatus360+Region,data= ds_asses)
+tabLoanStatus360region
+tabLoanStatus360deposit <- xtabs(~LoanStatus360+Deposit,data= ds_asses)
+tabLoanStatus360deposit
+tabLoanStatus360dailyrate <- xtabs(~LoanStatus360+DailyRate,data= ds_asses)
+tabLoanStatus360dailyrate
+tabLoanStatus360totalprice <- xtabs(~LoanStatus360+TotalPrice,data= ds_asses)
+tabLoanStatus360totalprice
+```
+
+```{r convert categorical variables to integer data types}
+#convert categorical variables to integer data types for regression purpose
+ds_asses [,1]=as.integer(ds_asses [,1])
+is.factor(ds_asses [,1])
+is.integer(ds_asses [,1])
+is.character(ds_asses [,1])
+ds_asses [,2]=as.integer(ds_asses [,2])-1
+is.factor(ds_asses [,2])
+is.integer(ds_asses [,2])
+is.character(ds_asses [,2])
+ds_asses [,3]=as.integer(ds_asses [,3])
+is.factor(ds_asses [,3])
+is.integer(ds_asses [,3])
+is.character(ds_asses [,3])
+ds_asses [,4]=as.integer(ds_asses [,4])
+is.factor(ds_asses [,4])
+is.integer(ds_asses [,4])
+is.character(ds_asses [,4])
+ds_asses [,13]=as.integer(ds_asses [,13])-1
+is.factor(ds_asses [,13])
+is.integer(ds_asses [,13])
+is.character(ds_asses [,13])
+View(ds_asses)
+```
+
+
+```{r correlation}
+cor_ds_asses1 <- cor(ds_asses [, c("Product", "CustomerGender", "Location", "Region" ,"TotalPrice", "Deposit", "DailyRate", "TotalDays", "AmountPaid30", "AmountPaid60", "AmountPaid360", "LoanStatus360")])
+cor_ds_asses1
+
+#Drop TotalDays column as it is not correlated with the rest of the columns
+cor_ds_asses <- round(cor(ds_asses [, c("Product", "CustomerGender", "Location", "Region" ,"TotalPrice", "Deposit", "DailyRate", "AmountPaid30", "AmountPaid60", "AmountPaid360", "LoanStatus360")]),2)
+cor_ds_asses
+```
+
+```{r heatmap}
+# we create a heatmap to visualize correlations
+
+cor.plot((ds_asses [, c("Product", "CustomerGender", "Location", "Region" ,"TotalPrice", "Deposit", "DailyRate", "AmountPaid30", "AmountPaid60", "AmountPaid360", "LoanStatus360")]),numbers=TRUE,main="corlpot")
+
+#or
+
+# Get lower triangle of the correlation matrix
+  get_lower_tri <- function(cor_ds_asses){
+    cor_ds_asses[upper.tri(cor_ds_asses)]<- NA
+    return(cor_ds_asses)
+  }
+lower_tri <- get_lower_tri(cor_ds_asses)
+lower_tri
+
+# Get upper triangle of the correlation matrix
+  get_upper_tri <- function(cor_ds_asses){
+    cor_ds_asses[lower.tri(cor_ds_asses)]<- NA
+    return(cor_ds_asses)
+  }
+upper_tri <- get_upper_tri(cor_ds_asses)
+upper_tri
+
+# Reorder the correlation matrix
+reorder_cor_ds_asses <- function(cor_ds_asses){
+# Use correlation between variables as distance
+dd <- as.dist((1-cor_ds_asses)/2)
+hc <- hclust(dd)
+cor_ds_asses <-cor_ds_asses[hc$order, hc$order]
+}
+cor_ds_asses <- reorder_cor_ds_asses(cor_ds_asses)
+# Melt the correlation matrix
+library(reshape2)
+
+melted_cor_ds_asses <- melt(upper_tri, na.rm = TRUE)
+
+library(ggplot2)
+ggplot(data = melted_cor_ds_asses, aes(Var2, Var1, fill = value))+
+ geom_tile(color = "white")+ 
+ scale_fill_gradient2(low = "blue", high = "red", mid = "green", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+   name="Pearson\nCorrelation") +
+  theme_minimal()+ 
+ theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    size = 12, hjust = 1))+
+ coord_fixed()
+```
+
+
+```{r fitting additive multivariate linear regression}
+#additive model investigates only the main effects of predictors. It assumes that the relationship between a given predictor variable and the outcome is independent of the other predictor variables
+
+#From the correlation table, we see that the AmountPaid360 is most strongly correlated with AmountPaid60. But in addition, we also see that TotalPrice and Deposit are positively correlated. 
+
+#We want to compute the association of the outcome variable AmountPaid360 with each predictor while adjusting for the effect of the remaining predictors. 
+
+#Both the multivariate regression and the correlation measure how strongly the features are associated with the outcome (AmountPaid360). When comparing the regression coefficients with the correlation coefficients, we will see that they are slightly different.Ccorrelation computes bivariate relationship between the outcome variable and a single predictor (ignoring all other predictors) while a multiple regression asks if that predictor is related to the outcome after controlling for all the other predictors in the model.
+
+mlm1a <- lm(AmountPaid360 ~ Product + CustomerGender + Location + Region + TotalPrice + Deposit + DailyRate + AmountPaid30 + AmountPaid60, data=ds_asses) #multivariate regression
+summary(mlm1a)
+```
+
+```{r drop daily rate}
+#DropDailyRate
+mlm2a <- lm(AmountPaid360 ~ Product + CustomerGender + Location + Region + TotalPrice + Deposit + AmountPaid30 + AmountPaid60, data=ds_asses) #multivariate regression
+summary(mlm2a)
+
+#Observed value in data is 13621
+newdata <- data.frame(Product =2,  CustomerGender=1, Location=109, Region=11, TotalPrice=16600, Deposit=2000, AmountPaid30=3121, AmountPaid60=4241)
+p <- predict(mlm2a, newdata, interval="confidence")
+p
+
+```
+
+```{r drop Location}
+#Drop Location does not contribute to the model
+mlm3a <- lm(AmountPaid360 ~ Product + CustomerGender + Region + TotalPrice + Deposit + AmountPaid30 + AmountPaid60, data=ds_asses) #multivariate regression
+summary(mlm3a)
+
+#Observed value in data is 13621
+newdata1 <- data.frame(Product=2, CustomerGender=1, Region=11, TotalPrice=16600, Deposit=2000, AmountPaid30=3121, AmountPaid60=4241)
+p1 <- predict(mlm3a, newdata1, interval="confidence")
+p1
+```
+```{r drop Product}
+#Drop Product does not contribute to the model
+#Final Model
+mlm4a <- lm(AmountPaid360 ~ CustomerGender + Region + TotalPrice + Deposit + AmountPaid30 + AmountPaid60, data=ds_asses) #multivariate regression
+summary(mlm4a)
+
+#Observed value in data is 13621
+newdata2 <- data.frame(CustomerGender=1, Region=11, TotalPrice=16600, Deposit=2000, AmountPaid30=3121, AmountPaid60=4241)
+p2 <- predict(mlm4a, newdata2, interval="confidence")
+p2
+
+sigma(mlm4a) # Residual Standard Error (RSE). The lower the RSE, the more accurate the model (on the data in hand).
+sigma(mlm4a)/mean(ds_asses$AmountPaid360) #The error rate
+coefficients(mlm4a) # model coefficients
+confint(mlm4a, level=0.95) # CIs for model parameters
+anova(mlm4a) # anova table
+vcov(mlm4a) # covariance matrix for model parameters
+```
+
+
+```{r predicted values}
+fitted(mlm4a) # predicted values
+```
+
+```{r other useful multivariate linear regression functions}
+residuals(mlm4a) # residuals
+```
+
+
+```{r other useful multivariate linear regression functions 1}
+#influence(mlm4a) # regression diagnostics $hat $coefficients $sigma $wt. residuals
+```
+
+
+```{r understanding accuracy of model }
+#Accuracy of the final model with Actual vs Predicted
+plot(fitted(mlm4a), ds_asses$AmountPaid360, 
+     ylab="Actual", xlab="Predicted", 
+     main="AmountPaid360")
+
+#Accuracy of the final model with Residual vs Predicted
+#positive values for the residual (on the y-axis) mean the prediction was too low, and negative values mean the prediction was too high; 0 means the guess was exactly correct.
+plot(fitted(mlm4a), residuals(mlm4a), 
+     ylab="Residuals", xlab="Predicted", 
+     main="AmountPaid360")
+abline(0,0)
+```
+
+```{r Interpratation of additive multiple regression model}
+
+#The final multiple regression model equation can be written as AmountPaid360 = -643.7088144 + 150.3377772*CustomerGender + 29.2051094*Region + 0.4946036*TotalPrice - 1.0720393*Deposit - 1.1353656*AmountPaid30 + 2.5102698*AmountPaid60.
+
+
+#The overall quality of the model can be assessed by examining the R-squared (R2) and Residual Standard Error (RSE).
+
+#R2 represents the correlation coefficient between the observed values of the outcome variable (y) and the predicted values of y. For this reason, the value of R will always be positive and will range from zero to one. R2 represents the proportion of variance, in the outcome variable y, that may be predicted by knowing the value of the x variables. An R2 value close to 1 indicates that the model explains a large portion of the variance in the outcome variable. Problem with the R2, is that, it will always increase when more variables are added to the model, even if those variables are only weakly associated with the response. A solution is to adjust the R2 by taking into account the number of predictor variables.
+
+#The adjusted R2 = 0.6527, meaning that “65.27% of the variance in the measure of AmountPaid360 can be predicted by CustomerGender, Region, TotalPrice, Deposit,  AmountPaid30 and AmountPaid60.
+#In our multiple regression model, the RSE is 3934.305 corresponding to 26.8% error rate.
+```
+
+
+```{r Classification model to predict LoanStatus360}
+#Classification model to predict LoanStatus360
+ds_asses1 <- ds_asses [, c("Product", "CustomerGender", "Location", "Region" ,"TotalPrice", "Deposit", "DailyRate", "AmountPaid30", "AmountPaid60", "LoanStatus360")]
+
+# see the stucture
+head(ds_asses1)
+tail(ds_asses1)
+
+#1.Shuffle your data
+#From the head and tail output, you can see if the data is shuffled or not. 
+#If not shuffled it will be a big issue! When you will split your data between a train set and test set, you will select only loanstatus 0 and 1 (No 2 are in the top 80 percent of the observations), which means the algorithm will never see the features of 2. This mistake will lead to poor prediction.
+
+shuffle_index <- sample(1:nrow(ds_asses1)) #Generate a random list of index from 1 to 9195
+head(shuffle_index)
+tail(shuffle_index)
+ds_asses2 <- ds_asses1[shuffle_index, ]
+head(ds_asses2)
+tail(ds_asses2)
+
+#2.Create a train and test set: You train the model on the train set and test the prediction on the test set (i.e. unseen data)
+
+#Split the data 80/20, 80 percent of the data serves to train the model, and 20 percent to make predictions
+
+#Function to create two separate data frames. You don't want to touch the test set until you finish building your model
+
+create_train_test <- function(data, size = 0.8, train = TRUE) #Add the arguments in the function
+  {
+    n_row = nrow(data) #Count number of rows in the dataset
+    total_row = size * n_row #Return the nth row to construct the train set
+    train_sample <- 1: total_row #Select the first row to the nth rows
+    if (train == TRUE) {
+        return (data[train_sample, ]) #If condition sets to true, return the train set, else the test set
+    } else {
+        return (data[-train_sample, ])
+    }
+}
+
+data_train <- create_train_test(ds_asses2, 0.8, train = TRUE)
+data_test <- create_train_test(ds_asses2, 0.8, train = FALSE)
+dim(data_train)
+dim(data_test)
+
+#Verify Randomization Process
+prop.table(table(data_train$CustomerGender))
+prop.table(table(data_test$CustomerGender))
+
+#3.Buildthemodel
+
+library(rpart)
+fit <- rpart(LoanStatus360~., data = data_train, method = 'class')
+fit
+
+
+#4.Make a Prediction
+
+predict_unseen <-predict(fit, data_test, type = 'class')
+table_mat <- table(data_test$LoanStatus360, predict_unseen)
+table_mat
+
+library(gmodels)
+#understand the relationship of the classes of your test data relate to your model 
+CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)
+
+#5.MeasurePerfomance
+#compute an accuracy measure for classification task with the confusion matrix. The general idea is to count the number of times True instances are classified are False.
+
+accuracy_Test <- sum(diag(table_mat)) / sum(table_mat)
+print(paste('Accuracy for test', accuracy_Test))
+
+```
+
+```{r Knn Classification model to predict LoanStatus360}
+#Knn Classification model to predict LoanStatus360
+
+# see the stucture
+head(ds_asses1)
+tail(ds_asses1)
+
+# Division of `LoanStatus360`
+table(ds_asses1$LoanStatus360) 
+
+# Percentual division of `LoanStatus360`
+round(prop.table(table(ds_asses1$LoanStatus360)) * 100, digits = 2)
+
+##Generate a random number that is 70% of the total number of rows in dataset.
+ ran <- sample(1:nrow(ds_asses1), 0.7 * nrow(ds_asses1))
+
+##the normalization function is created
+ nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
+ 
+ ##Run nomalization on predictor coulumns of dataset
+ ds_asses1_norm <- as.data.frame(lapply(ds_asses[,c("Product", "CustomerGender", "Location", "Region" ,"TotalPrice", "Deposit", "DailyRate", "AmountPaid30", "AmountPaid60")], nor))
+ summary(ds_asses1_norm)
+ 
+ ##extract training set
+ds_asses1_train <- ds_asses1_norm[ran,]
+##extract testing set
+ds_asses1_test <- ds_asses1_norm[-ran,]
+
+dim(ds_asses1_train)
+dim(ds_asses1_test)
+
+
+#Verify Randomization Process
+prop.table(table(ds_asses1_train$Product))
+prop.table(table(ds_asses1_test$Product))
+prop.table(table(ds_asses1_train$CustomerGender))
+prop.table(table(ds_asses1_test$CustomerGender))
+
+##extract 10th column of train dataset because it will be used as 'cl' argument in knn function.
+ds_asses1_target_category <- ds_asses1[ran,10]
+
+ ##extract 10th column if test dataset to measure the accuracy
+ ds_asses1_test_category <- ds_asses1[-ran,10]
+ 
+ ##load the package class
+ library(class)
+ 
+ #To choose the appropiate number of k, the most widely used method is to do the square root of the rows
+
+sqrt(nrow(ds_asses1))
+
+##run knn function
+ prk <- knn(ds_asses1_train,ds_asses1_test,cl=ds_asses1_target_category,k=96,prob = TRUE)
+ prk
+ 
+#check the extent inside the knn model.
+
+prk.prob <- attr(prk, "prob")
+head(prk)
+head(prk.prob)
+
+#understand the relationship of the classes of your test data relate to your model 
+CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)
+
+ ##create confusion matrix
+ tabc <- table(prk,ds_asses1_test_category)
+ tabc
+ 
+ ##this function divides the correct predictions by total number of predictions that tell us how accurate the model is.
+ 
+ accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+ accuracy(tabc)
+ 
+ #check which ‘K’ value will result in the most accurate model
+
+i=1
+k.optm=1
+for (i in 1:96){
+knn.mod <- knn(train=ds_asses1_train, test=ds_asses1_test, cl=ds_asses1_target_category, k=i)
+k.optm[i] <- 100 * sum(ds_asses1_test_category == knn.mod)/NROW(ds_asses1_test_category)
+k=i  
+    cat(k,'=',k.optm[i],'\n')
+}
+
+# Maximum accuracy at k=12, after that, it seems increasing K increases the classification but reduces success rate. It is worse to class LoanStatus360 as good when it is bad, than it is to class LoanStatus360 as bad when it is good.
+plot(k.optm, type = 'b', xlab="K- Value", ylab="Accuracy level")
+```
+
+```{r Challenges faced in building the models}
+#categorical data are too many. Focus more on collecting integer data type features like the Amount of Income, size of the family, age, loan amount.
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
