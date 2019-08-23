@@ -1,7 +1,8 @@
 ---
 title: "loan prediction"
 output:
-  html_document: default
+  html_document: 
+    keep_md: yes
   word_document: default
   pdf_document: default
 ---
