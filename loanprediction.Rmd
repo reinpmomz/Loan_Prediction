@@ -1,10 +1,10 @@
 ---
 title: "loan prediction"
 output:
-  pdf_document: default
-  word_document: default
   html_document: 
     keep_md: yes
+  word_document: default
+  pdf_document: default
 ---
 
 
@@ -262,8 +262,8 @@ vcov(mlm4a) # covariance matrix for model parameters
 ```
 
 
-```{r understanding accuracy of model }
-#Accuracy of the final model with Actual vs Predicted
+```{r AccuracyOfModel}
+#Understanding Accuracy of the final model with Actual vs Predicted
 plot(fitted(mlm4a), ds_asses$AmountPaid360, 
      ylab="Actual", xlab="Predicted", 
      main="AmountPaid360")
@@ -389,7 +389,7 @@ print(paste('Accuracy for test', accuracy_Test))
 
 ```
 
-```{r Knn Classification model to predict LoanStatus360}
+```{r Knn}
 #Knn Classification model to predict LoanStatus360
 
 # see the stucture
