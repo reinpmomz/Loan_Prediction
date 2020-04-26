@@ -446,6 +446,8 @@ sqrt(nrow(ds_asses1))
 
 ##run knn function
  prk <- knn(ds_asses1_train,ds_asses1_test,cl=ds_asses1_target_category,k=96,prob = TRUE)
+ prk
+
  
 #check the extent inside the knn model.
 
@@ -459,6 +461,9 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)
  ##create confusion matrix
  tabc <- table(prk,ds_asses1_test_category)
  tabc
+ 
+library(caret)
+ confusionMatrix(tabc)
  
  ##this function divides the correct predictions by total number of predictions 
  #that tell us how accurate the model is.
