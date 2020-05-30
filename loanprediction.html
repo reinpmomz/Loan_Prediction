@@ -11,7 +11,7 @@
 
 <meta name="author" content="Reinp" />
 
-<meta name="date" content="2020-05-05" />
+<meta name="date" content="2020-05-30" />
 
 <title>loan prediction</title>
 
@@ -365,7 +365,7 @@ summary {
 
 <h1 class="title toc-ignore">loan prediction</h1>
 <h4 class="author">Reinp</h4>
-<h4 class="date">2020-05-05</h4>
+<h4 class="date">2020-05-30</h4>
 
 </div>
 
@@ -381,8 +381,10 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(stats)
 library(psych) </code></pre>
 <pre class="r"><code>#loading dataset
+
+library(tidyverse)
 setwd(&#39;E:/Documents/Reinp/GitHub Respositories/Loan_Prediction-with-RStudio&#39;)
-ds_asses&lt;-read.table(&#39;Data Science assessment.csv&#39;, header=TRUE,sep=&quot;,&quot;)
+ds_asses&lt;-read.csv(&#39;Data Science assessment.csv&#39;, header=TRUE,sep=&quot;,&quot;)
 #ds_asses[,-14]  #Reads only the required columns in csv
 View(ds_asses)
 attach(ds_asses)</code></pre>
@@ -393,22 +395,20 @@ names(ds_asses) #display variable names</code></pre>
 ##  [9] &quot;TotalDays&quot;      &quot;AmountPaid30&quot;   &quot;AmountPaid60&quot;   &quot;AmountPaid360&quot; 
 ## [13] &quot;LoanStatus360&quot;</code></pre>
 <pre class="r"><code>summary(ds_asses) #summarizes the dataset</code></pre>
-<pre><code>##       Product          CustomerGender        Location         Region    
-##  Product A:3141   Female      :3290   Location 25: 295   Region 6:2934  
-##  Product B:3862   Male        :5358   Location 3 : 244   Region 3:1941  
-##  Product C: 999   NotSpecified: 547   Location 6 : 201   Region 2:1364  
-##  Product D: 975                       Location 22: 179   Region 1:1232  
-##  Product E: 213                       Location 39: 177   Region 7: 622  
-##  Product F:   5                       Location 61: 173   Region 4: 588  
-##                                       (Other)    :7926   (Other) : 514  
-##    TotalPrice         StartDate       Deposit       DailyRate     
-##  Min.   :13775   5/24/2014 :  28   Min.   :1000   Min.   : 35.00  
-##  1st Qu.:16600   1/23/2016 :  22   1st Qu.:2000   1st Qu.: 40.00  
-##  Median :16600   09-11-15  :  20   Median :2000   Median : 40.00  
-##  Mean   :19266   12/13/2015:  20   Mean   :2312   Mean   : 46.45  
-##  3rd Qu.:20250   9/13/2015 :  20   3rd Qu.:2000   3rd Qu.: 50.00  
-##  Max.   :69225   4/23/2015 :  19   Max.   :9000   Max.   :165.00  
-##                  (Other)   :9066                                  
+<pre><code>##    Product          CustomerGender       Location            Region         
+##  Length:9195        Length:9195        Length:9195        Length:9195       
+##  Class :character   Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+##                                                                             
+##                                                                             
+##                                                                             
+##    TotalPrice     StartDate            Deposit       DailyRate     
+##  Min.   :13775   Length:9195        Min.   :1000   Min.   : 35.00  
+##  1st Qu.:16600   Class :character   1st Qu.:2000   1st Qu.: 40.00  
+##  Median :16600   Mode  :character   Median :2000   Median : 40.00  
+##  Mean   :19266                      Mean   :2312   Mean   : 46.45  
+##  3rd Qu.:20250                      3rd Qu.:2000   3rd Qu.: 50.00  
+##  Max.   :69225                      Max.   :9000   Max.   :165.00  
 ##    TotalDays    AmountPaid30    AmountPaid60   AmountPaid360  
 ##  Min.   :365   Min.   :-3200   Min.   :-3200   Min.   :-3200  
 ##  1st Qu.:365   1st Qu.: 2500   1st Qu.: 3438   1st Qu.:11351  
@@ -416,44 +416,42 @@ names(ds_asses) #display variable names</code></pre>
 ##  Mean   :365   Mean   : 3580   Mean   : 4736   Mean   :14674  
 ##  3rd Qu.:365   3rd Qu.: 4601   3rd Qu.: 5668   3rd Qu.:16600  
 ##  Max.   :365   Max.   :26001   Max.   :33501   Max.   :69225  
-##                                                               
-##           LoanStatus360 
-##  Active          :6742  
-##  Blocked         : 849  
-##  Finished Payment:1604  
-##                         
-##                         
-##                         
+##  LoanStatus360     
+##  Length:9195       
+##  Class :character  
+##  Mode  :character  
+##                    
+##                    
 ## </code></pre>
 <pre class="r"><code>describe(ds_asses) </code></pre>
 <pre><code>##                 vars    n     mean      sd median  trimmed     mad   min   max
-## Product*           1 9195     2.05    1.04      2     1.91    1.48     1     6
-## CustomerGender*    2 9195     1.70    0.57      2     1.68    0.00     1     3
-## Location*          3 9195   339.95  248.10    305   325.95  302.45     1   791
-## Region*            4 9195    11.58    4.68     12    12.37    4.45     1    18
+## Product*           1 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## CustomerGender*    2 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## Location*          3 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## Region*            4 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
 ## TotalPrice         5 9195 19266.26 6053.29  16600 18397.93 1482.60 13775 69225
-## StartDate*         6 9195   762.22  434.80    769   762.95  542.63     1  1517
+## StartDate*         6 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
 ## Deposit            7 9195  2311.53 1412.61   2000  2116.56    0.00  1000  9000
 ## DailyRate          8 9195    46.45   13.38     40    44.61    0.00    35   165
 ## TotalDays          9 9195   365.00    0.00    365   365.00    0.00   365   365
 ## AmountPaid30      10 9195  3580.48 2487.32   3351  3465.23 1555.25 -3200 26001
 ## AmountPaid60      11 9195  4735.67 2756.33   4400  4548.92 1482.60 -3200 33501
 ## AmountPaid360     12 9195 14673.83 6676.24  15140 14459.55 4062.32 -3200 69225
-## LoanStatus360*    13 9195     1.44    0.77      1     1.30    0.00     1     3
-##                 range  skew kurtosis    se
-## Product*            5  0.98     0.30  0.01
-## CustomerGender*     2  0.12    -0.58  0.01
-## Location*         790  0.40    -1.09  2.59
-## Region*            17 -1.44     0.84  0.05
-## TotalPrice      55450  4.88    26.51 63.13
-## StartDate*       1516 -0.03    -1.19  4.53
-## Deposit          8000  2.63     9.39 14.73
-## DailyRate         130  5.02    27.94  0.14
-## TotalDays           0   NaN      NaN  0.00
-## AmountPaid30    29201  1.39     6.37 25.94
-## AmountPaid60    36701  1.83     8.08 28.74
-## AmountPaid360   72425  2.18    11.88 69.62
-## LoanStatus360*      2  1.34     0.01  0.01</code></pre>
+## LoanStatus360*    13 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+##                 range skew kurtosis    se
+## Product*         -Inf   NA       NA    NA
+## CustomerGender*  -Inf   NA       NA    NA
+## Location*        -Inf   NA       NA    NA
+## Region*          -Inf   NA       NA    NA
+## TotalPrice      55450 4.88    26.51 63.13
+## StartDate*       -Inf   NA       NA    NA
+## Deposit          8000 2.63     9.39 14.73
+## DailyRate         130 5.02    27.94  0.14
+## TotalDays           0  NaN      NaN  0.00
+## AmountPaid30    29201 1.39     6.37 25.94
+## AmountPaid60    36701 1.83     8.08 28.74
+## AmountPaid360   72425 2.18    11.88 69.62
+## LoanStatus360*   -Inf   NA       NA    NA</code></pre>
 <pre class="r"><code>#learn more about the dataset
 help(ds_asses)</code></pre>
 <pre><code>## No documentation for &#39;ds_asses&#39; in specified packages and libraries:
@@ -461,19 +459,19 @@ help(ds_asses)</code></pre>
 <pre class="r"><code>??ds_asses
 str(ds_asses)</code></pre>
 <pre><code>## &#39;data.frame&#39;:    9195 obs. of  13 variables:
-##  $ Product       : Factor w/ 6 levels &quot;Product A&quot;,&quot;Product B&quot;,..: 2 2 3 2 4 2 1 2 1 1 ...
-##  $ CustomerGender: Factor w/ 3 levels &quot;Female&quot;,&quot;Male&quot;,..: 2 2 1 2 1 1 2 2 1 1 ...
-##  $ Location      : Factor w/ 791 levels &quot;Location 1&quot;,&quot;Location 10&quot;,..: 109 220 442 553 660 2 13 24 220 35 ...
-##  $ Region        : Factor w/ 18 levels &quot;Region 1&quot;,&quot;Region 10&quot;,..: 11 12 14 1 11 11 12 15 12 15 ...
+##  $ Product       : chr  &quot;Product B&quot; &quot;Product B&quot; &quot;Product C&quot; &quot;Product B&quot; ...
+##  $ CustomerGender: chr  &quot;Male&quot; &quot;Male&quot; &quot;Female&quot; &quot;Male&quot; ...
+##  $ Location      : chr  &quot;Location 2&quot; &quot;Location 3&quot; &quot;Location 5&quot; &quot;Location 6&quot; ...
+##  $ Region        : chr  &quot;Region 2&quot; &quot;Region 3&quot; &quot;Region 5&quot; &quot;Region 1&quot; ...
 ##  $ TotalPrice    : int  16600 16600 15600 16600 20250 16600 20250 16600 22250 20250 ...
-##  $ StartDate     : Factor w/ 1517 levels &quot;01-01-13&quot;,&quot;01-01-15&quot;,..: 324 6 793 921 637 1065 326 1086 424 1347 ...
+##  $ StartDate     : chr  &quot;07-04-14&quot; &quot;01-02-15&quot; &quot;12-08-12&quot; &quot;2/20/2015&quot; ...
 ##  $ Deposit       : int  2000 2000 1000 2000 2000 2000 2000 2000 4000 2000 ...
 ##  $ DailyRate     : int  40 40 40 40 50 40 50 40 50 50 ...
 ##  $ TotalDays     : int  365 365 365 365 365 365 365 365 365 365 ...
 ##  $ AmountPaid30  : int  3121 3061 2160 3041 3470 3201 1851 3971 5750 1951 ...
 ##  $ AmountPaid60  : int  4241 4171 3280 4241 4820 4141 3251 4131 7450 3251 ...
 ##  $ AmountPaid360 : int  13621 15041 15340 15321 13720 14141 17701 15351 20250 17351 ...
-##  $ LoanStatus360 : Factor w/ 3 levels &quot;Active&quot;,&quot;Blocked&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+##  $ LoanStatus360 : chr  &quot;Active&quot; &quot;Active&quot; &quot;Active&quot; &quot;Active&quot; ...</code></pre>
 <pre class="r"><code>class(ds_asses)</code></pre>
 <pre><code>## [1] &quot;data.frame&quot;</code></pre>
 <pre class="r"><code>typeof(ds_asses) </code></pre>
@@ -577,42 +575,56 @@ tabLoanStatus360totalprice</code></pre>
 ##   Blocked              0    81   439    94   111    11   106     0     6     1
 ##   Finished Payment     7   320   646    32   285     8   287     0    18     1</code></pre>
 <pre class="r"><code>#convert categorical variables to integer data types for regression purpose
-ds_asses [,1]=as.integer(ds_asses [,1])
-is.factor(ds_asses [,1])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.integer(ds_asses [,1])</code></pre>
+ds_asses$Product=as.factor(ds_asses$Product)
+is.factor(ds_asses$Product)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>is.character(ds_asses [,1])</code></pre>
+<pre class="r"><code>ds_asses$Product=as.numeric(ds_asses$Product)
+is.integer(ds_asses$Product)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>ds_asses [,2]=as.integer(ds_asses [,2])-1
-is.factor(ds_asses [,2])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.integer(ds_asses [,2])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.character(ds_asses [,2])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>ds_asses [,3]=as.integer(ds_asses [,3])
-is.factor(ds_asses [,3])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.integer(ds_asses [,3])</code></pre>
+<pre class="r"><code>is.numeric(ds_asses$Product)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>is.character(ds_asses [,3])</code></pre>
+<pre class="r"><code>is.character(ds_asses$Product)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>ds_asses [,4]=as.integer(ds_asses [,4])
-is.factor(ds_asses [,4])</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.integer(ds_asses [,4])</code></pre>
+<pre class="r"><code>ds_asses$CustomerGender=as.factor(ds_asses$CustomerGender)
+is.factor(ds_asses$CustomerGender)</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>is.character(ds_asses [,4])</code></pre>
+<pre class="r"><code>ds_asses$CustomerGender=as.numeric(ds_asses$CustomerGender)
+is.integer(ds_asses$CustomerGender)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>ds_asses [,13]=as.integer(ds_asses [,13])-1
-is.factor(ds_asses [,13])</code></pre>
+<pre class="r"><code>is.numeric(ds_asses$CustomerGender)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.character(ds_asses$CustomerGender)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.integer(ds_asses [,13])</code></pre>
+<pre class="r"><code>ds_asses$Location=as.factor(ds_asses$Location)
+is.factor(ds_asses$Location)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>ds_asses$Location=as.numeric(ds_asses$Location)
+is.integer(ds_asses$Location)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>is.character(ds_asses [,13])</code></pre>
+<pre class="r"><code>is.numeric(ds_asses$Location)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.character(ds_asses$Location)</code></pre>
 <pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>View(ds_asses)</code></pre>
+<pre class="r"><code>ds_asses$Region=as.factor(ds_asses$Region)
+is.factor(ds_asses$Region)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>ds_asses$Region=as.numeric(ds_asses$Region)
+is.integer(ds_asses$Region)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.numeric(ds_asses$Region)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.character(ds_asses$Region)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>ds_asses$LoanStatus360=as.factor(ds_asses$LoanStatus360)
+is.factor(ds_asses$LoanStatus360)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>ds_asses$LoanStatus360=as.numeric(ds_asses$LoanStatus360)
+is.integer(ds_asses$LoanStatus360)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>is.numeric(ds_asses$LoanStatus360)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>is.character(ds_asses$LoanStatus360)</code></pre>
+<pre><code>## [1] FALSE</code></pre>
 <pre class="r"><code>cor_ds_asses1 &lt;- cor(ds_asses [, c(&quot;Product&quot;, &quot;CustomerGender&quot;, &quot;Location&quot;, 
 &quot;Region&quot; ,&quot;TotalPrice&quot;, &quot;Deposit&quot;, &quot;DailyRate&quot;, &quot;TotalDays&quot;, &quot;AmountPaid30&quot;, 
 &quot;AmountPaid60&quot;, &quot;AmountPaid360&quot;, &quot;LoanStatus360&quot;)])
@@ -762,7 +774,8 @@ dd &lt;- as.dist((1-cor_ds_asses)/2)
 hc &lt;- hclust(dd)
 cor_ds_asses &lt;-cor_ds_asses[hc$order, hc$order]
 }
-cor_ds_asses &lt;- reorder_cor_ds_asses(cor_ds_asses)
+cor_ds_asses2 &lt;- reorder_cor_ds_asses(cor_ds_asses)
+
 # Melt the correlation matrix
 library(reshape2)
 
@@ -778,7 +791,7 @@ ggplot(data = melted_cor_ds_asses, aes(Var2, Var1, fill = value))+
  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
     size = 12, hjust = 1))+
  coord_fixed()</code></pre>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <pre class="r"><code>#additive model investigates only the main effects of predictors. 
 #It assumes that the relationship between a given predictor variable 
 #and the outcome is independent of the other predictor variables
@@ -814,7 +827,7 @@ summary(mlm1a)</code></pre>
 ## 
 ## Coefficients: (1 not defined because of singularities)
 ##                  Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    -694.34338  209.96174  -3.307 0.000947 ***
+## (Intercept)    -869.22408  236.30752  -3.678 0.000236 ***
 ## Product         -98.95731   53.05113  -1.865 0.062168 .  
 ## CustomerGender  174.88070   74.04345   2.362 0.018204 *  
 ## Location          0.13513    0.16641   0.812 0.416790    
@@ -847,7 +860,7 @@ summary(mlm2a)</code></pre>
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    -694.34338  209.96174  -3.307 0.000947 ***
+## (Intercept)    -869.22408  236.30752  -3.678 0.000236 ***
 ## Product         -98.95731   53.05113  -1.865 0.062168 .  
 ## CustomerGender  174.88070   74.04345   2.362 0.018204 *  
 ## Location          0.13513    0.16641   0.812 0.416790    
@@ -868,8 +881,8 @@ Region=11, TotalPrice=16600, Deposit=2000, AmountPaid30=3121,
 AmountPaid60=4241)
 p &lt;- predict(mlm2a, newdata, interval=&quot;confidence&quot;)
 p</code></pre>
-<pre><code>##        fit   lwr      upr
-## 1 12950.48 12822 13078.97</code></pre>
+<pre><code>##       fit      lwr     upr
+## 1 12775.6 12615.51 12935.7</code></pre>
 <pre class="r"><code>#Drop Location does not contribute to the model
 mlm3a &lt;- lm(AmountPaid360 ~ Product + CustomerGender + Region + 
 TotalPrice + Deposit + AmountPaid30 + AmountPaid60, data=ds_asses) 
@@ -886,10 +899,10 @@ summary(mlm3a)</code></pre>
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    -651.26315  203.14502  -3.206  0.00135 ** 
-## Product        -101.57837   52.95186  -1.918  0.05510 .  
-## CustomerGender  174.65458   74.04156   2.359  0.01835 *  
-## Region           27.59426    8.83313   3.124  0.00179 ** 
+## (Intercept)    -825.91773  230.20676  -3.588 0.000335 ***
+## Product        -101.57837   52.95186  -1.918 0.055102 .  
+## CustomerGender  174.65458   74.04156   2.359 0.018351 *  
+## Region           27.59426    8.83313   3.124 0.001790 ** 
 ## TotalPrice        0.51190    0.01701  30.096  &lt; 2e-16 ***
 ## Deposit          -1.17973    0.09673 -12.196  &lt; 2e-16 ***
 ## AmountPaid30     -1.10534    0.06665 -16.584  &lt; 2e-16 ***
@@ -906,7 +919,7 @@ TotalPrice=16600, Deposit=2000, AmountPaid30=3121, AmountPaid60=4241)
 p1 &lt;- predict(mlm3a, newdata1, interval=&quot;confidence&quot;)
 p1</code></pre>
 <pre><code>##        fit      lwr      upr
-## 1 12981.11 12876.02 13086.19</code></pre>
+## 1 12806.45 12664.74 12948.17</code></pre>
 <pre class="r"><code>#Drop Product does not contribute to the model
 #Final Model
 mlm4a &lt;- lm(AmountPaid360 ~ CustomerGender + Region + TotalPrice + 
@@ -924,7 +937,7 @@ summary(mlm4a)</code></pre>
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    -643.70881  203.13647  -3.169 0.001535 ** 
+## (Intercept)    -794.04659  229.63994  -3.458 0.000547 ***
 ## CustomerGender  150.33778   72.95903   2.061 0.039371 *  
 ## Region           29.20511    8.79441   3.321 0.000901 ***
 ## TotalPrice        0.49460    0.01442  34.292  &lt; 2e-16 ***
@@ -942,8 +955,8 @@ newdata2 &lt;- data.frame(CustomerGender=1, Region=11, TotalPrice=16600,
 Deposit=2000, AmountPaid30=3121, AmountPaid60=4241)
 p2 &lt;- predict(mlm4a, newdata2, interval=&quot;confidence&quot;)
 p2</code></pre>
-<pre><code>##       fit      lwr      upr
-## 1 12996.8 12892.93 13100.67</code></pre>
+<pre><code>##        fit      lwr      upr
+## 1 12846.47 12710.76 12982.17</code></pre>
 <pre class="r"><code>sigma(mlm4a) # Residual Standard Error (RSE). The lower the RSE, the more </code></pre>
 <pre><code>## [1] 3934.305</code></pre>
 <pre class="r"><code>#accurate the model (on the data in hand).
@@ -951,12 +964,12 @@ sigma(mlm4a)/mean(ds_asses$AmountPaid360) #The error rate</code></pre>
 <pre><code>## [1] 0.2681171</code></pre>
 <pre class="r"><code>coefficients(mlm4a) # model coefficients</code></pre>
 <pre><code>##    (Intercept) CustomerGender         Region     TotalPrice        Deposit 
-##   -643.7088144    150.3377772     29.2051094      0.4946036     -1.0720393 
+##   -794.0465916    150.3377772     29.2051094      0.4946036     -1.0720393 
 ##   AmountPaid30   AmountPaid60 
 ##     -1.1353656      2.5102698</code></pre>
 <pre class="r"><code>confint(mlm4a, level=0.95) # CIs for model parameters</code></pre>
 <pre><code>##                        2.5 %       97.5 %
-## (Intercept)    -1041.9014283 -245.5162006
+## (Intercept)    -1244.1918987 -343.9012846
 ## CustomerGender     7.3218671  293.3536872
 ## Region            11.9661084   46.4441103
 ## TotalPrice         0.4663306    0.5228766
@@ -979,15 +992,15 @@ sigma(mlm4a)/mean(ds_asses$AmountPaid360) #The error rate</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>vcov(mlm4a) # covariance matrix for model parameters</code></pre>
 <pre><code>##                  (Intercept) CustomerGender        Region    TotalPrice
-## (Intercept)     4.126442e+04  -3.073529e+03 -9.077594e+02 -2.0624482419
-## CustomerGender -3.073529e+03   5.323020e+03 -3.338803e+00 -0.0993581245
-## Region         -9.077594e+02  -3.338803e+00  7.734168e+01  0.0050764365
-## TotalPrice     -2.062448e+00  -9.935812e-02  5.076437e-03  0.0002080335
-## Deposit         7.082079e+00   1.030079e+00 -2.701815e-02 -0.0008656772
-## AmountPaid30   -9.628892e-01  -2.487421e-01  1.979133e-02  0.0003067156
-## AmountPaid60   -2.050758e-02  -4.203525e-02 -1.941552e-02 -0.0002178811
+## (Intercept)     5.273450e+04  -8.396549e+03 -9.044206e+02 -1.9630901174
+## CustomerGender -8.396549e+03   5.323020e+03 -3.338803e+00 -0.0993581245
+## Region         -9.044206e+02  -3.338803e+00  7.734168e+01  0.0050764365
+## TotalPrice     -1.963090e+00  -9.935812e-02  5.076437e-03  0.0002080335
+## Deposit         6.052000e+00   1.030079e+00 -2.701815e-02 -0.0008656772
+## AmountPaid30   -7.141471e-01  -2.487421e-01  1.979133e-02  0.0003067156
+## AmountPaid60    2.152767e-02  -4.203525e-02 -1.941552e-02 -0.0002178811
 ##                      Deposit  AmountPaid30  AmountPaid60
-## (Intercept)     7.0820792766 -0.9628892221 -0.0205075822
+## (Intercept)     6.0520004193 -0.7141471317  0.0215276680
 ## CustomerGender  1.0300788573 -0.2487420904 -0.0420352501
 ## Region         -0.0270181465  0.0197913250 -0.0194155166
 ## TotalPrice     -0.0008656772  0.0003067156 -0.0002178811
@@ -1043,34 +1056,34 @@ ds_asses1 &lt;- ds_asses [, c(&quot;Product&quot;, &quot;CustomerGender&quot;, &
 # see the stucture
 head(ds_asses1)</code></pre>
 <pre><code>##   Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 1       2              1      109     11      16600    2000        40
-## 2       2              1      220     12      16600    2000        40
-## 3       3              0      442     14      15600    1000        40
-## 4       2              1      553      1      16600    2000        40
-## 5       4              0      660     11      20250    2000        50
-## 6       2              0        2     11      16600    2000        40
+## 1       2              2      109     11      16600    2000        40
+## 2       2              2      220     12      16600    2000        40
+## 3       3              1      442     14      15600    1000        40
+## 4       2              2      553      1      16600    2000        40
+## 5       4              1      660     11      20250    2000        50
+## 6       2              1        2     11      16600    2000        40
 ##   AmountPaid30 AmountPaid60 LoanStatus360
-## 1         3121         4241             0
-## 2         3061         4171             0
-## 3         2160         3280             0
-## 4         3041         4241             0
-## 5         3470         4820             0
-## 6         3201         4141             0</code></pre>
+## 1         3121         4241             1
+## 2         3061         4171             1
+## 3         2160         3280             1
+## 4         3041         4241             1
+## 5         3470         4820             1
+## 6         3201         4141             1</code></pre>
 <pre class="r"><code>tail(ds_asses1)</code></pre>
 <pre><code>##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 9190       3              1      447     15      15600    1000        40
-## 9191       1              0      221     11      20250    2000        50
-## 9192       4              0      520     15      20250    2000        50
-## 9193       2              0      763     11      16600    2000        40
-## 9194       2              1      331     13      16600    2000        40
-## 9195       4              1       67      1      20250    2000        50
+## 9190       3              2      447     15      15600    1000        40
+## 9191       1              1      221     11      20250    2000        50
+## 9192       4              1      520     15      20250    2000        50
+## 9193       2              1      763     11      16600    2000        40
+## 9194       2              2      331     13      16600    2000        40
+## 9195       4              2       67      1      20250    2000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 9190         2040         3400             2
-## 9191         3601         4301             2
-## 9192         4001         5501             2
-## 9193         3401         4601             2
-## 9194         3400         4600             2
-## 9195         6950         6950             2</code></pre>
+## 9190         2040         3400             3
+## 9191         3601         4301             3
+## 9192         4001         5501             3
+## 9193         3401         4601             3
+## 9194         3400         4600             3
+## 9195         6950         6950             3</code></pre>
 <pre class="r"><code>#1.Shuffle your data
 #From the head and tail output, you can see if the data is shuffled or not. 
 #If not shuffled it will be a big issue! When you will split your data between 
@@ -1078,43 +1091,44 @@ head(ds_asses1)</code></pre>
 #the top 80 percent of the observations), which means the algorithm will never see 
 #the features of 2. This mistake will lead to poor prediction.
 
+
 shuffle_index &lt;- sample(1:nrow(ds_asses1)) #Generate a random list of index from 
 #1 to 9195
 head(shuffle_index)</code></pre>
-<pre><code>## [1] 2560 3388 4136 6020  802 2298</code></pre>
+<pre><code>## [1] 7462 7970 6570  505  890 4030</code></pre>
 <pre class="r"><code>tail(shuffle_index)</code></pre>
-<pre><code>## [1] 3771 9036 2013 9168 5021 4064</code></pre>
+<pre><code>## [1] 2973 5301 6104 9144 4060 5808</code></pre>
 <pre class="r"><code>ds_asses2 &lt;- ds_asses1[shuffle_index, ]
 head(ds_asses2)</code></pre>
 <pre><code>##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 2560       2              0      376      1      16600    2000        40
-## 3388       2              0      443      1      16600    2000        40
-## 4136       2              1        2     11      16600    2000        40
-## 6020       1              1       87     16      22250    4000        50
-## 802        2              0      211     12      16600    2000        40
-## 2298       2              1      763     11      16600    2000        40
+## 7462       3              3      548     11      15600    1000        40
+## 7970       2              2      243     15      16600    2000        40
+## 6570       4              2      423     15      20250    2000        50
+## 505        2              2      354     13      16600    2000        40
+## 890        1              2      784     15      20750    2500        50
+## 4030       1              1      165     12      19250    1000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 2560         3448         4448             0
-## 3388         3081         4181             0
-## 4136         3080         4440             0
-## 6020         5390         7030             0
-## 802          3040         4400             0
-## 2298         2991         4104             0</code></pre>
+## 7462         2040         2640             2
+## 7970         3141         4201             3
+## 6570         3301         4891             1
+## 505          3041         4001             1
+## 890          3400         3600             1
+## 4030          500         2150             1</code></pre>
 <pre class="r"><code>tail(ds_asses2)</code></pre>
 <pre><code>##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 3771       2              1      331     13      16600    2000        40
-## 9036       3              2      102     15      15600    1000        40
-## 2013       4              1      390     18      20250    2000        50
-## 9168       1              0      661     16      19250    1000        50
-## 5021       5              1      476     15      54625    9000       125
-## 4064       1              0      779     15      22250    4000        50
+## 2973       2              1      553      1      16600    2000        40
+## 5301       2              1       41      1      16600    2000        40
+## 6104       3              2       96     15      15600    1000        40
+## 9144       3              2       86     15      15600    1000        40
+## 4060       3              2      373     17      15600    1000        40
+## 5808       2              2      376      1      16600    2000        40
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 3771         3251         4501             0
-## 9036         2500         3400             2
-## 2013         3351         4851             0
-## 9168         2000         8900             2
-## 5021        12376        16126             0
-## 4064         5230         6970             0</code></pre>
+## 2973         3251         3891             1
+## 5301         3261         4251             1
+## 6104         1600         2000             1
+## 9144         2300         3400             3
+## 4060         2200         3280             1
+## 5808         3391         4351             1</code></pre>
 <pre class="r"><code>#2.Create a train and test set: You train the model on the train set and test the 
 #prediction on the test set (i.e. unseen data)
 
@@ -1123,7 +1137,7 @@ head(ds_asses2)</code></pre>
 
 #Function to create two separate data frames. You don&#39;t want to touch the test set 
 #until you finish building your model
-
+set.seed(1729)
 create_train_test &lt;- function(data, size = 0.8, train = TRUE) #Add the arguments in 
   #the function
   {
@@ -1147,12 +1161,12 @@ dim(data_train)</code></pre>
 <pre class="r"><code>#Verify Randomization Process
 prop.table(table(data_train$CustomerGender))</code></pre>
 <pre><code>## 
-##          0          1          2 
-## 0.35997825 0.58156607 0.05845568</code></pre>
+##          1          2          3 
+## 0.35440457 0.58401305 0.06158238</code></pre>
 <pre class="r"><code>prop.table(table(data_test$CustomerGender))</code></pre>
 <pre><code>## 
-##          0          1          2 
-## 0.34910277 0.58727569 0.06362153</code></pre>
+##          1          2          3 
+## 0.37139750 0.57748777 0.05111474</code></pre>
 <pre class="r"><code>#3.Buildthemodel
 
 library(rpart)
@@ -1163,23 +1177,17 @@ fit</code></pre>
 ## node), split, n, loss, yval, (yprob)
 ##       * denotes terminal node
 ## 
-##  1) root 7356 1960 0 (0.73355084 0.09325721 0.17319195)  
-##    2) AmountPaid60&lt; 4563 4108  880 0 (0.78578384 0.12682571 0.08739046) *
-##    3) AmountPaid60&gt;=4563 3248 1080 0 (0.66748768 0.05080049 0.28171182)  
-##      6) TotalPrice&gt;=21500 1473  339 0 (0.76985743 0.06042091 0.16972166) *
-##      7) TotalPrice&lt; 21500 1775  741 0 (0.58253521 0.04281690 0.37464789)  
-##       14) AmountPaid60&lt; 5230.5 1105  358 0 (0.67601810 0.04796380 0.27601810) *
-##       15) AmountPaid60&gt;=5230.5 670  310 2 (0.42835821 0.03432836 0.53731343) *</code></pre>
+## 1) root 7356 1977 1 (0.73123980 0.09284937 0.17591082) *</code></pre>
 <pre class="r"><code>#4.Make a Prediction
 
 predict_unseen &lt;-predict(fit, data_test, type = &#39;class&#39;)
 table_mat &lt;- table(data_test$LoanStatus360, predict_unseen)
 table_mat</code></pre>
 <pre><code>##    predict_unseen
-##        0    1    2
-##   0 1278    0   68
-##   1  156    0    7
-##   2  249    0   81</code></pre>
+##        1    2    3
+##   1 1363    0    0
+##   2  166    0    0
+##   3  310    0    0</code></pre>
 <pre class="r"><code>library(gmodels)
 #understand the relationship of the classes of your test data related to your model 
 CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)</code></pre>
@@ -1188,8 +1196,6 @@ CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)</c
 ##    Cell Contents
 ## |-------------------------|
 ## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
 ## |         N / Table Total |
 ## |-------------------------|
 ## 
@@ -1198,26 +1204,19 @@ CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)</c
 ## 
 ##  
 ##                         | predict_unseen 
-## data_test$LoanStatus360 |         0 |         2 | Row Total | 
-## ------------------------|-----------|-----------|-----------|
-##                       0 |      1278 |        68 |      1346 | 
-##                         |     0.949 |     0.051 |     0.732 | 
-##                         |     0.759 |     0.436 |           | 
-##                         |     0.695 |     0.037 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       1 |       156 |         7 |       163 | 
-##                         |     0.957 |     0.043 |     0.089 | 
-##                         |     0.093 |     0.045 |           | 
-##                         |     0.085 |     0.004 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       2 |       249 |        81 |       330 | 
-##                         |     0.755 |     0.245 |     0.179 | 
-##                         |     0.148 |     0.519 |           | 
-##                         |     0.135 |     0.044 |           | 
-## ------------------------|-----------|-----------|-----------|
-##            Column Total |      1683 |       156 |      1839 | 
-##                         |     0.915 |     0.085 |           | 
-## ------------------------|-----------|-----------|-----------|
+## data_test$LoanStatus360 |         1 | Row Total | 
+## ------------------------|-----------|-----------|
+##                       1 |      1363 |      1363 | 
+##                         |     0.741 |           | 
+## ------------------------|-----------|-----------|
+##                       2 |       166 |       166 | 
+##                         |     0.090 |           | 
+## ------------------------|-----------|-----------|
+##                       3 |       310 |       310 | 
+##                         |     0.169 |           | 
+## ------------------------|-----------|-----------|
+##            Column Total |      1839 |      1839 | 
+## ------------------------|-----------|-----------|
 ## 
 ## </code></pre>
 <pre class="r"><code>#5.MeasurePerfomance
@@ -1226,49 +1225,49 @@ CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)</c
 
 accuracy_Test &lt;- sum(diag(table_mat)) / sum(table_mat)
 print(paste(&#39;Accuracy for test&#39;, accuracy_Test))</code></pre>
-<pre><code>## [1] &quot;Accuracy for test 0.738988580750408&quot;</code></pre>
+<pre><code>## [1] &quot;Accuracy for test 0.741163675910821&quot;</code></pre>
 <pre class="r"><code>#Knn Classification model to predict LoanStatus360
 
 # see the stucture
 head(ds_asses1)</code></pre>
 <pre><code>##   Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 1       2              1      109     11      16600    2000        40
-## 2       2              1      220     12      16600    2000        40
-## 3       3              0      442     14      15600    1000        40
-## 4       2              1      553      1      16600    2000        40
-## 5       4              0      660     11      20250    2000        50
-## 6       2              0        2     11      16600    2000        40
+## 1       2              2      109     11      16600    2000        40
+## 2       2              2      220     12      16600    2000        40
+## 3       3              1      442     14      15600    1000        40
+## 4       2              2      553      1      16600    2000        40
+## 5       4              1      660     11      20250    2000        50
+## 6       2              1        2     11      16600    2000        40
 ##   AmountPaid30 AmountPaid60 LoanStatus360
-## 1         3121         4241             0
-## 2         3061         4171             0
-## 3         2160         3280             0
-## 4         3041         4241             0
-## 5         3470         4820             0
-## 6         3201         4141             0</code></pre>
+## 1         3121         4241             1
+## 2         3061         4171             1
+## 3         2160         3280             1
+## 4         3041         4241             1
+## 5         3470         4820             1
+## 6         3201         4141             1</code></pre>
 <pre class="r"><code>tail(ds_asses1)</code></pre>
 <pre><code>##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 9190       3              1      447     15      15600    1000        40
-## 9191       1              0      221     11      20250    2000        50
-## 9192       4              0      520     15      20250    2000        50
-## 9193       2              0      763     11      16600    2000        40
-## 9194       2              1      331     13      16600    2000        40
-## 9195       4              1       67      1      20250    2000        50
+## 9190       3              2      447     15      15600    1000        40
+## 9191       1              1      221     11      20250    2000        50
+## 9192       4              1      520     15      20250    2000        50
+## 9193       2              1      763     11      16600    2000        40
+## 9194       2              2      331     13      16600    2000        40
+## 9195       4              2       67      1      20250    2000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 9190         2040         3400             2
-## 9191         3601         4301             2
-## 9192         4001         5501             2
-## 9193         3401         4601             2
-## 9194         3400         4600             2
-## 9195         6950         6950             2</code></pre>
+## 9190         2040         3400             3
+## 9191         3601         4301             3
+## 9192         4001         5501             3
+## 9193         3401         4601             3
+## 9194         3400         4600             3
+## 9195         6950         6950             3</code></pre>
 <pre class="r"><code># Division of `LoanStatus360`
 table(ds_asses1$LoanStatus360) </code></pre>
 <pre><code>## 
-##    0    1    2 
+##    1    2    3 
 ## 6742  849 1604</code></pre>
 <pre class="r"><code># Percentual division of `LoanStatus360`
 round(prop.table(table(ds_asses1$LoanStatus360)) * 100, digits = 2)</code></pre>
 <pre><code>## 
-##     0     1     2 
+##     1     2     3 
 ## 73.32  9.23 17.44</code></pre>
 <pre class="r"><code>##Generate a random number that is 70% of the total number of rows in dataset.
  ran &lt;- sample(1:nrow(ds_asses1), 0.7 * nrow(ds_asses1))
@@ -1315,19 +1314,19 @@ dim(ds_asses1_train)</code></pre>
 prop.table(table(ds_asses1_train$Product))</code></pre>
 <pre><code>## 
 ##          0        0.2        0.4        0.6        0.8          1 
-## 0.33903045 0.41811684 0.11155998 0.10829708 0.02221877 0.00077688</code></pre>
+## 0.34431324 0.41858297 0.11062772 0.10348042 0.02221877 0.00077688</code></pre>
 <pre class="r"><code>prop.table(table(ds_asses1_test$Product))</code></pre>
 <pre><code>## 
 ##          0        0.2        0.4        0.6        0.8 
-## 0.34758971 0.42442914 0.10184850 0.10076115 0.02537151</code></pre>
+## 0.33526640 0.42334179 0.10402320 0.11199710 0.02537151</code></pre>
 <pre class="r"><code>prop.table(table(ds_asses1_train$CustomerGender))</code></pre>
 <pre><code>## 
 ##          0        0.5          1 
-## 0.35565569 0.58172778 0.06261653</code></pre>
+## 0.35783095 0.58141703 0.06075202</code></pre>
 <pre class="r"><code>prop.table(table(ds_asses1_test$CustomerGender))</code></pre>
 <pre><code>## 
 ##          0        0.5          1 
-## 0.36281261 0.58499456 0.05219282</code></pre>
+## 0.35773831 0.58571946 0.05654223</code></pre>
 <pre class="r"><code>##extract 10th column of train dataset because it will be used as &#39;cl&#39; argument 
 #in knn function.
 ds_asses1_target_category &lt;- ds_asses1[ran,10]
@@ -1346,486 +1345,486 @@ sqrt(nrow(ds_asses1))</code></pre>
 <pre class="r"><code>##run knn function
  prk &lt;- knn(ds_asses1_train,ds_asses1_test,cl=ds_asses1_target_category,k=96,prob = TRUE)
  prk</code></pre>
-<pre><code>##    [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##   [38] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##   [75] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [112] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [149] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [186] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [223] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [260] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [297] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [334] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [371] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [408] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [445] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [482] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [519] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [556] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [593] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [630] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [667] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [704] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [741] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [778] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [815] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [852] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [889] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [926] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [963] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1000] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1037] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1074] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1111] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1148] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1185] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1222] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1259] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1296] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1333] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1370] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1407] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1444] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1481] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1518] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1555] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1592] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1629] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1666] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1703] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1740] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1777] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1814] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1851] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1888] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1925] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1962] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1999] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2036] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2073] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2110] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2147] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2184] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2221] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2258] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2295] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2332] 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2369] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2406] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2443] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2480] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2517] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2554] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2591] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2628] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2665] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2702] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2739] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+<pre><code>##    [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##   [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##   [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [149] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [186] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [223] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [260] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [297] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [334] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [371] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [408] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [445] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [482] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [519] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [556] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [593] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [630] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [667] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [704] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [741] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [778] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [815] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [852] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [889] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [926] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [963] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1000] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1037] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1074] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1111] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1148] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1185] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1222] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1259] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1296] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1333] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1370] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1407] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1444] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1481] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1518] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1555] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1592] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1629] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1666] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1703] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1740] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1777] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1814] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1851] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1888] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1925] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1962] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1999] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2036] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2073] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2110] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2147] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2184] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2221] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2258] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2295] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2332] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2369] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2406] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2443] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2480] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2517] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2554] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2591] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2628] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2665] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2702] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2739] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 ## attr(,&quot;prob&quot;)
-##    [1] 0.7083333 0.8333333 0.7604167 0.8333333 0.6562500 0.6770833 0.8333333
-##    [8] 0.7422680 0.9270833 0.8437500 0.7083333 0.8437500 0.7708333 0.8437500
-##   [15] 0.7187500 0.7187500 0.7525773 0.6458333 0.8750000 0.8144330 0.7083333
-##   [22] 0.8541667 0.6875000 0.7395833 0.9062500 0.8247423 0.8333333 0.7395833
-##   [29] 0.8125000 0.7083333 0.7083333 0.8541667 0.8645833 0.7083333 0.7187500
-##   [36] 0.8854167 0.5312500 0.8350515 0.7916667 0.7708333 0.5729167 0.6458333
-##   [43] 0.8125000 0.8333333 0.7187500 0.8645833 0.7500000 0.6979167 0.8333333
-##   [50] 0.7916667 0.8437500 0.7916667 0.7291667 0.6979167 0.8854167 0.9166667
-##   [57] 0.7916667 0.8541667 0.9166667 0.7395833 0.8645833 0.8333333 0.8229167
-##   [64] 0.8437500 0.8541667 0.7500000 0.7500000 0.7604167 0.7708333 0.8645833
-##   [71] 0.6262626 0.6979167 0.8645833 0.8541667 0.8762887 0.8645833 0.9166667
-##   [78] 0.7187500 0.9166667 0.5520833 0.6562500 0.7812500 0.7812500 0.8437500
-##   [85] 0.8125000 0.8125000 0.8645833 0.7604167 0.8125000 0.7187500 0.7916667
-##   [92] 0.6979167 0.6770833 0.6907216 0.6979167 0.8041237 0.7812500 0.8020833
-##   [99] 0.7083333 0.9062500 0.8750000 0.7500000 0.7708333 0.8437500 0.6354167
-##  [106] 0.7083333 0.6666667 0.7187500 0.6565657 0.7291667 0.6666667 0.8020833
-##  [113] 0.7812500 0.7187500 0.6875000 0.5625000 0.7500000 0.6770833 0.7708333
-##  [120] 0.7083333 0.8229167 0.8453608 0.6979167 0.9062500 0.6562500 0.7319588
-##  [127] 0.6979167 0.8437500 0.8125000 0.8854167 0.8541667 0.6979167 0.6666667
-##  [134] 0.7083333 0.7604167 0.8854167 0.8437500 0.8229167 0.8125000 0.7916667
-##  [141] 0.7083333 0.7083333 0.9479167 0.8229167 0.6875000 0.8645833 0.7916667
-##  [148] 0.8333333 0.8229167 0.8645833 0.7708333 0.8854167 0.7291667 0.8437500
-##  [155] 0.7500000 0.7812500 0.7708333 0.7604167 0.8437500 0.9166667 0.7708333
-##  [162] 0.7187500 0.7604167 0.7500000 0.8020833 0.6666667 0.7916667 0.6354167
-##  [169] 0.7812500 0.7731959 0.8020833 0.8750000 0.7083333 0.8645833 0.7916667
-##  [176] 0.8541667 0.6979167 0.8541667 0.7083333 0.7812500 0.6458333 0.8645833
-##  [183] 0.7812500 0.6979167 0.8645833 0.7708333 0.6979167 0.7812500 0.5625000
-##  [190] 0.8958333 0.7708333 0.6666667 0.9072165 0.7604167 0.8020833 0.7319588
-##  [197] 0.7812500 0.7708333 0.8125000 0.7395833 0.6875000 0.7812500 0.8020833
-##  [204] 0.7604167 0.8437500 0.5520833 0.7083333 0.7916667 0.7500000 0.8556701
-##  [211] 0.8865979 0.7083333 0.6979167 0.7604167 0.8437500 0.8229167 0.8437500
-##  [218] 0.8541667 0.7200000 0.6391753 0.8229167 0.5312500 0.7291667 0.6562500
-##  [225] 0.7291667 0.7604167 0.6562500 0.6770833 0.8437500 0.7291667 0.6770833
-##  [232] 0.8333333 0.7083333 0.7395833 0.8020833 0.7708333 0.8437500 0.7812500
-##  [239] 0.8958333 0.7187500 0.8229167 0.7083333 0.6494845 0.7812500 0.7708333
-##  [246] 0.7422680 0.7291667 0.7395833 0.6979167 0.7187500 0.8333333 0.7500000
-##  [253] 0.7083333 0.7812500 0.7319588 0.9166667 0.6770833 0.6979167 0.8541667
-##  [260] 0.7083333 0.8854167 0.7604167 0.6770833 0.6666667 0.9270833 0.7500000
-##  [267] 0.7604167 0.7272727 0.7142857 0.7812500 0.8541667 0.5312500 0.7916667
-##  [274] 0.7628866 0.7500000 0.5463918 0.5520833 0.7083333 0.7812500 0.8969072
-##  [281] 0.6979167 0.7291667 0.7708333 0.8750000 0.7500000 0.7422680 0.8020833
-##  [288] 0.8020833 0.7291667 0.8125000 0.7291667 0.7708333 0.8958333 0.6979167
-##  [295] 0.7083333 0.7187500 0.8750000 0.7708333 0.8229167 0.7916667 0.6979167
-##  [302] 0.7083333 0.8350515 0.7604167 0.7812500 0.6562500 0.7187500 0.8020833
-##  [309] 0.9062500 0.8229167 0.8333333 0.6145833 0.8125000 0.8020833 0.9166667
-##  [316] 0.8229167 0.8750000 0.7083333 0.7010309 0.8958333 0.7083333 0.8144330
-##  [323] 0.7291667 0.8437500 0.7916667 0.6979167 0.8020833 0.7708333 0.6666667
-##  [330] 0.8854167 0.7812500 0.7812500 0.7916667 0.8229167 0.7604167 0.8854167
-##  [337] 0.7812500 0.7708333 0.5937500 0.8750000 0.8333333 0.6979167 0.8333333
-##  [344] 0.7708333 0.8645833 0.6666667 0.7291667 0.7500000 0.8333333 0.7812500
-##  [351] 0.6770833 0.8750000 0.7187500 0.6875000 0.8125000 0.6458333 0.7604167
-##  [358] 0.8020833 0.5000000 0.6458333 0.5000000 0.5876289 0.7010309 0.7187500
-##  [365] 0.7604167 0.7395833 0.7319588 0.7812500 0.7708333 0.7187500 0.8958333
-##  [372] 0.7187500 0.6530612 0.9175258 0.7291667 0.9062500 0.7604167 0.6041667
-##  [379] 0.7346939 0.7500000 0.8229167 0.7916667 0.5520833 0.6666667 0.7291667
-##  [386] 0.6979167 0.6770833 0.5625000 0.8750000 0.6875000 0.7291667 0.6701031
-##  [393] 0.8229167 0.6875000 0.8333333 0.7500000 0.6770833 0.6458333 0.6041667
-##  [400] 0.7272727 0.7525773 0.7395833 0.8125000 0.7500000 0.8229167 0.6666667
-##  [407] 0.7083333 0.7187500 0.7604167 0.8144330 0.5312500 0.6875000 0.8854167
-##  [414] 0.7916667 0.7187500 0.8020833 0.6701031 0.7812500 0.7187500 0.7812500
-##  [421] 0.6979167 0.7878788 0.6562500 0.7187500 0.8958333 0.8333333 0.6770833
-##  [428] 0.7708333 0.7604167 0.7916667 0.6250000 0.9062500 0.7187500 0.5520833
-##  [435] 0.8333333 0.8333333 0.7291667 0.9375000 0.7604167 0.7395833 0.9375000
-##  [442] 0.6770833 0.9375000 0.6666667 0.8333333 0.6354167 0.7708333 0.8645833
-##  [449] 0.7395833 0.8958333 0.8125000 0.7708333 0.5416667 0.6979167 0.9375000
-##  [456] 0.7187500 0.5520833 0.6770833 0.7291667 0.8854167 0.7812500 0.7083333
-##  [463] 0.8125000 0.7708333 0.6041667 0.7291667 0.8125000 0.7291667 0.6979167
-##  [470] 0.6875000 0.8437500 0.8020833 0.6979167 0.7708333 0.7812500 0.6979167
-##  [477] 0.6770833 0.8645833 0.6979167 0.8125000 0.8958333 0.7708333 0.8333333
-##  [484] 0.7604167 0.7525773 0.7395833 0.7604167 0.8645833 0.8020833 0.7291667
-##  [491] 0.9166667 0.8541667 0.7244898 0.7916667 0.7628866 0.8750000 0.8437500
-##  [498] 0.7187500 0.8229167 0.9270833 0.6145833 0.6666667 0.7291667 0.7291667
-##  [505] 0.6875000 0.8541667 0.8020833 0.6770833 0.6770833 0.7500000 0.8854167
-##  [512] 0.8125000 0.6979167 0.7291667 0.6597938 0.7916667 0.8750000 0.5520833
-##  [519] 0.8958333 0.7083333 0.9375000 0.8020833 0.8541667 0.7291667 0.8556701
-##  [526] 0.7500000 0.8645833 0.7083333 0.7604167 0.7812500 0.7395833 0.5729167
-##  [533] 0.8080808 0.6770833 0.7187500 0.8762887 0.8958333 0.6666667 0.8645833
-##  [540] 0.7916667 0.7187500 0.8541667 0.7083333 0.6562500 0.8125000 0.7291667
-##  [547] 0.7812500 0.8125000 0.6458333 0.8750000 0.8163265 0.8229167 0.7604167
-##  [554] 0.7083333 0.6979167 0.7500000 0.8229167 0.8229167 0.8958333 0.8333333
-##  [561] 0.7187500 0.8541667 0.6666667 0.7708333 0.7812500 0.8333333 0.6562500
-##  [568] 0.8645833 0.6875000 0.7708333 0.7604167 0.9166667 0.5463918 0.9062500
-##  [575] 0.8229167 0.5416667 0.8229167 0.8437500 0.7395833 0.8958333 0.8125000
-##  [582] 0.8229167 0.7395833 0.7812500 0.8229167 0.7812500 0.8854167 0.7113402
-##  [589] 0.8333333 0.7291667 0.7083333 0.7500000 0.7708333 0.8125000 0.7291667
-##  [596] 0.7083333 0.7291667 0.7916667 0.8229167 0.7916667 0.8333333 0.7291667
-##  [603] 0.6804124 0.6875000 0.8437500 0.8333333 0.8020833 0.7083333 0.8125000
-##  [610] 0.7812500 0.8645833 0.7395833 0.7708333 0.7708333 0.8854167 0.8229167
-##  [617] 0.7708333 0.8958333 0.6770833 0.5729167 0.8541667 0.8958333 0.7010309
-##  [624] 0.8350515 0.7395833 0.6979167 0.7291667 0.8854167 0.8125000 0.7187500
-##  [631] 0.8229167 0.7187500 0.6770833 0.7142857 0.7500000 0.8125000 0.8125000
-##  [638] 0.8541667 0.8958333 0.7500000 0.8854167 0.8020833 0.7083333 0.8229167
-##  [645] 0.8125000 0.7083333 0.6666667 0.5312500 0.8020833 0.8958333 0.7083333
-##  [652] 0.7812500 0.8437500 0.7500000 0.7500000 0.6875000 0.6875000 0.7812500
-##  [659] 0.8437500 0.7812500 0.6145833 0.6562500 0.6875000 0.6145833 0.8645833
-##  [666] 0.8229167 0.7291667 0.6770833 0.6875000 0.8645833 0.6770833 0.6979167
-##  [673] 0.7812500 0.7291667 0.6701031 0.8333333 0.7500000 0.7500000 0.8333333
-##  [680] 0.6666667 0.6354167 0.7291667 0.7812500 0.8750000 0.6494845 0.8437500
-##  [687] 0.8229167 0.8333333 0.7708333 0.6979167 0.7604167 0.8229167 0.8229167
-##  [694] 0.7395833 0.8333333 0.7291667 0.6875000 0.8645833 0.7291667 0.7187500
-##  [701] 0.8229167 0.6979167 0.8750000 0.7187500 0.7083333 0.8020833 0.7708333
-##  [708] 0.7083333 0.7812500 0.6875000 0.6562500 0.6082474 0.7395833 0.5257732
-##  [715] 0.7083333 0.7395833 0.6701031 0.7812500 0.7083333 0.7395833 0.7812500
-##  [722] 0.7604167 0.6979167 0.8229167 0.7708333 0.8865979 0.7187500 0.7604167
-##  [729] 0.7187500 0.6979167 0.8229167 0.7083333 0.8125000 0.7187500 0.6666667
-##  [736] 0.6666667 0.7708333 0.7812500 0.7731959 0.9166667 0.8541667 0.8437500
-##  [743] 0.8350515 0.7291667 0.7187500 0.7500000 0.7812500 0.7395833 0.6458333
-##  [750] 0.7187500 0.6979167 0.8750000 0.8750000 0.7083333 0.6979167 0.6666667
-##  [757] 0.8750000 0.8645833 0.7916667 0.7291667 0.8854167 0.7291667 0.7708333
-##  [764] 0.5520833 0.8958333 0.8333333 0.6770833 0.5208333 0.7083333 0.8541667
-##  [771] 0.8645833 0.7604167 0.7755102 0.8541667 0.5051546 0.7708333 0.7187500
-##  [778] 0.6458333 0.7812500 0.9375000 0.8541667 0.8979592 0.7500000 0.7916667
-##  [785] 0.8125000 0.6770833 0.8125000 0.6145833 0.7500000 0.8229167 0.7291667
-##  [792] 0.5833333 0.8541667 0.9062500 0.8125000 0.7708333 0.7395833 0.6562500
-##  [799] 0.7187500 0.5463918 0.9270833 0.7812500 0.7812500 0.6875000 0.6770833
-##  [806] 0.6979167 0.7113402 0.7500000 0.8333333 0.7916667 0.8750000 0.6250000
-##  [813] 0.8020833 0.8958333 0.8854167 0.8541667 0.6875000 0.7187500 0.7187500
-##  [820] 0.7812500 0.8020833 0.6979167 0.6979167 0.8229167 0.7083333 0.6666667
-##  [827] 0.6666667 0.7812500 0.7291667 0.8229167 0.7857143 0.8333333 0.6907216
-##  [834] 0.8437500 0.6875000 0.8333333 0.9270833 0.6875000 0.7010309 0.7291667
-##  [841] 0.6666667 0.6336634 0.8125000 0.8020833 0.6770833 0.8958333 0.7395833
-##  [848] 0.7628866 0.8229167 0.7083333 0.7708333 0.6875000 0.7291667 0.6666667
-##  [855] 0.7291667 0.7083333 0.6770833 0.7708333 0.7187500 0.8333333 0.6979167
-##  [862] 0.6770833 0.9062500 0.8854167 0.8229167 0.7812500 0.6979167 0.8229167
-##  [869] 0.8229167 0.7010309 0.7500000 0.7604167 0.8333333 0.8020833 0.8125000
-##  [876] 0.9166667 0.6875000 0.8958333 0.9270833 0.7812500 0.8958333 0.7395833
-##  [883] 0.6875000 0.6562500 0.6875000 0.8125000 0.7604167 0.6666667 0.7113402
-##  [890] 0.7083333 0.8958333 0.6562500 0.7500000 0.6666667 0.5729167 0.6666667
-##  [897] 0.8229167 0.7319588 0.7708333 0.6666667 0.7708333 0.8020833 0.7604167
-##  [904] 0.7708333 0.7916667 0.7604167 0.7916667 0.7604167 0.7291667 0.8854167
-##  [911] 0.7083333 0.5625000 0.8229167 0.5520833 0.7083333 0.8020833 0.6979167
-##  [918] 0.7319588 0.7187500 0.7010309 0.5312500 0.8125000 0.8020833 0.6875000
-##  [925] 0.6562500 0.7291667 0.8437500 0.7812500 0.7500000 0.7604167 0.8541667
-##  [932] 0.6770833 0.8854167 0.6145833 0.7395833 0.8229167 0.6875000 0.7187500
-##  [939] 0.7604167 0.6979167 0.7604167 0.8333333 0.7812500 0.7812500 0.8020833
-##  [946] 0.9062500 0.7731959 0.7604167 0.7113402 0.7604167 0.7083333 0.6979167
-##  [953] 0.8541667 0.6041667 0.7187500 0.8041237 0.8541667 0.8020833 0.7916667
-##  [960] 0.6875000 0.8020833 0.8437500 0.8854167 0.7708333 0.6458333 0.8541667
-##  [967] 0.7187500 0.7083333 0.6562500 0.8437500 0.6979167 0.8854167 0.9270833
-##  [974] 0.7604167 0.5729167 0.8437500 0.6562500 0.8125000 0.7708333 0.6041667
-##  [981] 0.7083333 0.6666667 0.7395833 0.5000000 0.6979167 0.6458333 0.8854167
-##  [988] 0.7500000 0.7187500 0.7604167 0.7187500 0.7113402 0.7395833 0.6875000
-##  [995] 0.8437500 0.7604167 0.7395833 0.7500000 0.7708333 0.8020833 0.9270833
-## [1002] 0.8437500 0.6979167 0.8229167 0.7708333 0.7916667 0.7812500 0.7708333
-## [1009] 0.8437500 0.7291667 0.7500000 0.7708333 0.8750000 0.5937500 0.8125000
-## [1016] 0.7291667 0.6907216 0.7812500 0.8125000 0.8229167 0.7113402 0.7422680
-## [1023] 0.7916667 0.8333333 0.7708333 0.6458333 0.8437500 0.9166667 0.7291667
-## [1030] 0.7708333 0.7500000 0.7812500 0.7187500 0.7083333 0.6562500 0.7187500
-## [1037] 0.6562500 0.9166667 0.8750000 0.8854167 0.8125000 0.8437500 0.7812500
-## [1044] 0.7916667 0.7395833 0.8125000 0.8541667 0.7187500 0.7916667 0.7083333
-## [1051] 0.7319588 0.7395833 0.8541667 0.7628866 0.8437500 0.9166667 0.5833333
-## [1058] 0.8125000 0.8125000 0.7500000 0.8541667 0.7916667 0.7083333 0.7916667
-## [1065] 0.7291667 0.8645833 0.5416667 0.8541667 0.6875000 0.7216495 0.8247423
-## [1072] 0.6770833 0.8541667 0.6666667 0.7291667 0.7812500 0.7812500 0.7083333
-## [1079] 0.6562500 0.7291667 0.7916667 0.6979167 0.8854167 0.7835052 0.7812500
-## [1086] 0.7604167 0.8125000 0.7291667 0.8333333 0.5312500 0.6979167 0.9166667
-## [1093] 0.7812500 0.7070707 0.8437500 0.7500000 0.8541667 0.8437500 0.6562500
-## [1100] 0.7604167 0.7291667 0.5937500 0.7812500 0.8125000 0.7083333 0.6562500
-## [1107] 0.6770833 0.5520833 0.6666667 0.8229167 0.7291667 0.9062500 0.6979167
-## [1114] 0.6969697 0.8750000 0.7395833 0.9166667 0.7812500 0.7395833 0.7604167
-## [1121] 0.8854167 0.9166667 0.7500000 0.8020833 0.7187500 0.7187500 0.7291667
-## [1128] 0.8229167 0.7500000 0.8229167 0.7187500 0.6458333 0.6666667 0.8229167
-## [1135] 0.7500000 0.5520833 0.8541667 0.7113402 0.7708333 0.8958333 0.7812500
-## [1142] 0.7291667 0.8750000 0.7291667 0.7083333 0.7187500 0.8333333 0.8333333
-## [1149] 0.8333333 0.7708333 0.7812500 0.6041667 0.8125000 0.5833333 0.8229167
-## [1156] 0.6907216 0.7395833 0.7291667 0.8958333 0.7708333 0.7708333 0.8125000
-## [1163] 0.6770833 0.8125000 0.7083333 0.8645833 0.8229167 0.7812500 0.7708333
-## [1170] 0.8020833 0.8125000 0.8541667 0.7500000 0.5520833 0.8020833 0.8854167
-## [1177] 0.7812500 0.8125000 0.8645833 0.9166667 0.8229167 0.6666667 0.7604167
-## [1184] 0.7083333 0.7604167 0.8229167 0.7187500 0.7812500 0.7187500 0.7395833
-## [1191] 0.8750000 0.7812500 0.7916667 0.7708333 0.8229167 0.7708333 0.7916667
-## [1198] 0.7604167 0.7812500 0.8333333 0.8229167 0.8020833 0.5520833 0.7500000
-## [1205] 0.7500000 0.8020833 0.8125000 0.7708333 0.8437500 0.7812500 0.6770833
-## [1212] 0.7422680 0.8659794 0.8041237 0.8125000 0.8437500 0.8645833 0.7812500
-## [1219] 0.8333333 0.6354167 0.8333333 0.6562500 0.8229167 0.9166667 0.8125000
-## [1226] 0.7812500 0.8958333 0.7395833 0.8645833 0.8541667 0.7291667 0.8645833
-## [1233] 0.8958333 0.7291667 0.7291667 0.8854167 0.7604167 0.7291667 0.8333333
-## [1240] 0.7916667 0.7187500 0.8645833 0.6250000 0.5416667 0.7500000 0.8333333
-## [1247] 0.8333333 0.6458333 0.6458333 0.7604167 0.7083333 0.6458333 0.7500000
-## [1254] 0.8229167 0.8645833 0.8333333 0.7916667 0.6875000 0.6979167 0.7291667
-## [1261] 0.8020833 0.6875000 0.8854167 0.7113402 0.7083333 0.9062500 0.6770833
-## [1268] 0.7708333 0.8020833 0.8125000 0.7395833 0.7525773 0.7812500 0.7291667
-## [1275] 0.7187500 0.6979167 0.8333333 0.8229167 0.6875000 0.8854167 0.7812500
-## [1282] 0.7708333 0.9062500 0.8541667 0.6666667 0.8125000 0.6979167 0.8125000
-## [1289] 0.7500000 0.7916667 0.7083333 0.7708333 0.6666667 0.7291667 0.7604167
-## [1296] 0.7187500 0.7083333 0.7525773 0.7812500 0.7083333 0.7291667 0.7812500
-## [1303] 0.8541667 0.7187500 0.8125000 0.7083333 0.7083333 0.8125000 0.6979167
-## [1310] 0.8020833 0.7812500 0.8645833 0.6979167 0.6979167 0.8125000 0.7916667
-## [1317] 0.8229167 0.7708333 0.7500000 0.8333333 0.8020833 0.6666667 0.6494845
-## [1324] 0.8541667 0.6875000 0.7604167 0.7812500 0.6562500 0.7187500 0.8125000
-## [1331] 0.9278351 0.8333333 0.7187500 0.7731959 0.7604167 0.8333333 0.7708333
-## [1338] 0.6666667 0.6666667 0.8645833 0.8125000 0.7916667 0.8333333 0.8229167
-## [1345] 0.9375000 0.7395833 0.7835052 0.6979167 0.7216495 0.7916667 0.5833333
-## [1352] 0.8854167 0.7604167 0.7916667 0.8333333 0.7916667 0.8020833 0.7291667
-## [1359] 0.7604167 0.7083333 0.8229167 0.7010309 0.7708333 0.8125000 0.9062500
-## [1366] 0.8854167 0.9062500 0.9166667 0.7812500 0.7916667 0.8229167 0.8437500
-## [1373] 0.8020833 0.6666667 0.8125000 0.6770833 0.8541667 0.8854167 0.8350515
-## [1380] 0.6979167 0.9062500 0.7187500 0.8750000 0.8541667 0.8958333 0.6770833
-## [1387] 0.8958333 0.6979167 0.8125000 0.8750000 0.7916667 0.6562500 0.6666667
-## [1394] 0.8854167 0.8437500 0.8020833 0.7916667 0.8437500 0.8437500 0.8020833
-## [1401] 0.6875000 0.7291667 0.7395833 0.7187500 0.8541667 0.7083333 0.7083333
-## [1408] 0.7395833 0.7708333 0.8020833 0.8020833 0.6354167 0.7083333 0.7291667
-## [1415] 0.9479167 0.9479167 0.7604167 0.8541667 0.7916667 0.7291667 0.8229167
-## [1422] 0.9166667 0.7812500 0.9375000 0.7916667 0.8229167 0.7083333 0.7083333
-## [1429] 0.7083333 0.7708333 0.4948454 0.7938144 0.6562500 0.8125000 0.8333333
-## [1436] 0.8541667 0.7708333 0.8645833 0.7083333 0.8020833 0.8229167 0.8854167
-## [1443] 0.7319588 0.5312500 0.7083333 0.7113402 0.6145833 0.8750000 0.7395833
-## [1450] 0.7500000 0.8125000 0.8020833 0.7395833 0.7291667 0.7083333 0.6875000
-## [1457] 0.7187500 0.7187500 0.7812500 0.6979167 0.7708333 0.8333333 0.7708333
-## [1464] 0.6666667 0.8958333 0.7291667 0.8020833 0.7291667 0.8125000 0.8333333
-## [1471] 0.7395833 0.8229167 0.9166667 0.5937500 0.8541667 0.8333333 0.7708333
-## [1478] 0.7604167 0.7291667 0.7708333 0.8229167 0.6979167 0.7812500 0.7500000
-## [1485] 0.7812500 0.8229167 0.9062500 0.6666667 0.8125000 0.9062500 0.8437500
-## [1492] 0.9479167 0.8020833 0.7083333 0.8854167 0.6770833 0.7070707 0.8854167
-## [1499] 0.7731959 0.8229167 0.7708333 0.9062500 0.7291667 0.8750000 0.6979167
-## [1506] 0.7916667 0.5937500 0.6250000 0.6875000 0.6458333 0.7500000 0.7500000
-## [1513] 0.9166667 0.8750000 0.7187500 0.8333333 0.9166667 0.8020833 0.6875000
-## [1520] 0.6458333 0.7500000 0.9166667 0.7500000 0.7916667 0.7731959 0.8437500
-## [1527] 0.8041237 0.7395833 0.7708333 0.7187500 0.7500000 0.8854167 0.7500000
-## [1534] 0.7291667 0.7812500 0.5104167 0.8125000 0.6770833 0.8854167 0.7708333
-## [1541] 0.8020833 0.8958333 0.5937500 0.9062500 0.9166667 0.7187500 0.5104167
-## [1548] 0.8645833 0.7291667 0.8750000 0.6666667 0.7500000 0.5625000 0.8333333
-## [1555] 0.7916667 0.7291667 0.7812500 0.7291667 0.7812500 0.6666667 0.7070707
-## [1562] 0.6666667 0.6666667 0.8125000 0.6666667 0.7395833 0.7604167 0.8229167
-## [1569] 0.6770833 0.7812500 0.8437500 0.6770833 0.7708333 0.8125000 0.8333333
-## [1576] 0.6666667 0.9166667 0.6145833 0.6875000 0.7812500 0.7500000 0.7916667
-## [1583] 0.8541667 0.8541667 0.6770833 0.8854167 0.7812500 0.8437500 0.8229167
-## [1590] 0.7604167 0.7187500 0.7812500 0.7500000 0.7916667 0.6666667 0.6875000
-## [1597] 0.9062500 0.7812500 0.9166667 0.7395833 0.7812500 0.7812500 0.7500000
-## [1604] 0.8750000 0.8437500 0.7083333 0.5670103 0.8958333 0.7291667 0.8333333
-## [1611] 0.7708333 0.7916667 0.8437500 0.8750000 0.7113402 0.7291667 0.7708333
-## [1618] 0.8958333 0.7291667 0.7500000 0.8437500 0.8333333 0.8163265 0.7812500
-## [1625] 0.7187500 0.7083333 0.8350515 0.8020833 0.7604167 0.8958333 0.7395833
-## [1632] 0.7083333 0.8437500 0.6770833 0.7187500 0.8020833 0.8020833 0.6666667
-## [1639] 0.7395833 0.8041237 0.8229167 0.8437500 0.8144330 0.7113402 0.7395833
-## [1646] 0.7187500 0.6666667 0.6875000 0.7083333 0.8541667 0.8125000 0.6770833
-## [1653] 0.7604167 0.7708333 0.7708333 0.8020833 0.7812500 0.7083333 0.7187500
-## [1660] 0.6770833 0.7395833 0.8125000 0.6666667 0.8541667 0.7395833 0.7708333
-## [1667] 0.8645833 0.8645833 0.7291667 0.7500000 0.7812500 0.8645833 0.7083333
-## [1674] 0.7083333 0.8854167 0.8958333 0.7291667 0.7083333 0.7187500 0.7187500
-## [1681] 0.7291667 0.8541667 0.9062500 0.8437500 0.7187500 0.8437500 0.8247423
-## [1688] 0.8541667 0.7291667 0.6979167 0.7525773 0.6907216 0.9270833 0.8181818
-## [1695] 0.8750000 0.6875000 0.6979167 0.7187500 0.7755102 0.6979167 0.6979167
-## [1702] 0.5729167 0.9062500 0.8645833 0.8541667 0.6701031 0.8541667 0.6875000
-## [1709] 0.7812500 0.7604167 0.6770833 0.7040816 0.8958333 0.8125000 0.9062500
-## [1716] 0.8125000 0.7113402 0.7708333 0.7291667 0.8750000 0.6979167 0.6666667
-## [1723] 0.7708333 0.8229167 0.7708333 0.7291667 0.7500000 0.7395833 0.8541667
-## [1730] 0.7604167 0.8645833 0.7187500 0.7187500 0.7916667 0.8333333 0.8020833
-## [1737] 0.6907216 0.5520833 0.9166667 0.8541667 0.6767677 0.7395833 0.7708333
-## [1744] 0.7708333 0.7083333 0.8958333 0.8541667 0.7916667 0.7395833 0.8333333
-## [1751] 0.8333333 0.8645833 0.7708333 0.7604167 0.8541667 0.9166667 0.8541667
-## [1758] 0.6875000 0.9062500 0.7395833 0.8125000 0.8333333 0.6458333 0.7083333
-## [1765] 0.7500000 0.7422680 0.5833333 0.7500000 0.7812500 0.7187500 0.6666667
-## [1772] 0.6666667 0.8437500 0.8854167 0.8229167 0.7604167 0.5000000 0.7291667
-## [1779] 0.7708333 0.7812500 0.7113402 0.7500000 0.7187500 0.8125000 0.9166667
-## [1786] 0.7708333 0.5312500 0.8541667 0.7187500 0.7187500 0.8958333 0.8645833
-## [1793] 0.8125000 0.5937500 0.7708333 0.7187500 0.8541667 0.5520833 0.7395833
-## [1800] 0.7708333 0.7708333 0.7708333 0.8020833 0.8333333 0.6666667 0.7500000
-## [1807] 0.7916667 0.9062500 0.8125000 0.7708333 0.6145833 0.6354167 0.6041667
-## [1814] 0.8020833 0.8125000 0.8020833 0.8125000 0.5729167 0.7083333 0.7500000
-## [1821] 0.7083333 0.7604167 0.7216495 0.8750000 0.8020833 0.8556701 0.7916667
-## [1828] 0.8125000 0.6875000 0.8020833 0.7500000 0.8125000 0.7708333 0.8020833
-## [1835] 0.7083333 0.7395833 0.7083333 0.7083333 0.7395833 0.8020833 0.5520833
-## [1842] 0.7395833 0.8229167 0.8333333 0.7812500 0.9166667 0.7916667 0.8333333
-## [1849] 0.7291667 0.7395833 0.7604167 0.8333333 0.9062500 0.7187500 0.8958333
-## [1856] 0.7187500 0.7083333 0.8645833 0.7395833 0.7525773 0.8750000 0.8541667
-## [1863] 0.7083333 0.8437500 0.6875000 0.8125000 0.8854167 0.5937500 0.7916667
-## [1870] 0.8125000 0.8541667 0.7187500 0.6770833 0.9479167 0.8437500 0.8958333
-## [1877] 0.6666667 0.8645833 0.8020833 0.7916667 0.8020833 0.8125000 0.7500000
-## [1884] 0.8854167 0.6145833 0.8854167 0.8541667 0.9166667 0.6979167 0.8854167
-## [1891] 0.7395833 0.7373737 0.8125000 0.7187500 0.8125000 0.7083333 0.6770833
-## [1898] 0.7916667 0.6562500 0.7604167 0.8750000 0.5312500 0.8125000 0.8854167
-## [1905] 0.8854167 0.8854167 0.7187500 0.7291667 0.8333333 0.9375000 0.7500000
-## [1912] 0.7395833 0.7500000 0.6979167 0.6979167 0.7708333 0.6979167 0.9375000
-## [1919] 0.7812500 0.7708333 0.7083333 0.7291667 0.8125000 0.7916667 0.8645833
-## [1926] 0.7500000 0.7083333 0.7083333 0.6875000 0.7708333 0.7291667 0.8437500
-## [1933] 0.8750000 0.6979167 0.7604167 0.7187500 0.6458333 0.7187500 0.9062500
-## [1940] 0.7604167 0.8229167 0.6666667 0.7291667 0.8541667 0.8854167 0.8229167
-## [1947] 0.7708333 0.6875000 0.6875000 0.7187500 0.8645833 0.7395833 0.7708333
-## [1954] 0.8958333 0.7500000 0.7500000 0.8645833 0.7291667 0.8333333 0.6979167
-## [1961] 0.7187500 0.7708333 0.7395833 0.7812500 0.8541667 0.6666667 0.7812500
-## [1968] 0.7187500 0.8125000 0.7812500 0.8645833 0.6770833 0.8645833 0.7916667
-## [1975] 0.7500000 0.7500000 0.7395833 0.9375000 0.6875000 0.8645833 0.6979167
-## [1982] 0.7812500 0.8541667 0.8229167 0.7500000 0.7291667 0.7395833 0.8020833
-## [1989] 0.9062500 0.8541667 0.7395833 0.8125000 0.8437500 0.7812500 0.6770833
-## [1996] 0.7916667 0.8750000 0.6458333 0.9062500 0.6979167 0.6666667 0.8125000
-## [2003] 0.6770833 0.7500000 0.9166667 0.6979167 0.7604167 0.9062500 0.9270833
-## [2010] 0.8020833 0.7187500 0.7395833 0.7395833 0.7604167 0.6875000 0.7010309
-## [2017] 0.8645833 0.6969697 0.8541667 0.6770833 0.7959184 0.7395833 0.9166667
-## [2024] 0.8659794 0.7395833 0.7291667 0.8854167 0.7708333 0.9062500 0.6458333
-## [2031] 0.7187500 0.9166667 0.8265306 0.8020833 0.6979167 0.8020833 0.8229167
-## [2038] 0.7291667 0.7083333 0.8020833 0.7938144 0.7291667 0.6875000 0.6770833
-## [2045] 0.6979167 0.6770833 0.7604167 0.6875000 0.7187500 0.6354167 0.9062500
-## [2052] 0.6666667 0.7083333 0.8020833 0.9166667 0.6979167 0.6770833 0.8125000
-## [2059] 0.7395833 0.7604167 0.8437500 0.6875000 0.9062500 0.7395833 0.6875000
-## [2066] 0.7291667 0.6770833 0.9166667 0.6666667 0.9166667 0.5729167 0.7291667
-## [2073] 0.6979167 0.9062500 0.8020833 0.6979167 0.8350515 0.7916667 0.8229167
-## [2080] 0.7812500 0.6354167 0.6770833 0.5937500 0.6770833 0.8229167 0.7604167
-## [2087] 0.8125000 0.6701031 0.7916667 0.5257732 0.8645833 0.8958333 0.8645833
-## [2094] 0.6875000 0.7083333 0.7083333 0.7291667 0.7500000 0.8229167 0.6770833
-## [2101] 0.6770833 0.6458333 0.7604167 0.7812500 0.8333333 0.5208333 0.7083333
-## [2108] 0.7525773 0.7373737 0.7291667 0.7916667 0.8437500 0.7812500 0.6666667
-## [2115] 0.7395833 0.6458333 0.7916667 0.6666667 0.8229167 0.7604167 0.6875000
-## [2122] 0.7113402 0.8541667 0.7083333 0.5416667 0.6666667 0.6770833 0.8333333
-## [2129] 0.6907216 0.8750000 0.7708333 0.6979167 0.7395833 0.8750000 0.6666667
-## [2136] 0.9375000 0.6875000 0.5937500 0.7500000 0.8556701 0.7708333 0.7187500
-## [2143] 0.7187500 0.7938144 0.6354167 0.7291667 0.7291667 0.7083333 0.8229167
-## [2150] 0.7291667 0.7083333 0.7916667 0.5979381 0.7291667 0.8333333 0.8437500
-## [2157] 0.6770833 0.7291667 0.7708333 0.7916667 0.8333333 0.7604167 0.8020833
-## [2164] 0.8125000 0.7187500 0.7812500 0.7500000 0.8541667 0.6666667 0.8020833
-## [2171] 0.5416667 0.7500000 0.7187500 0.6875000 0.7216495 0.7291667 0.7187500
-## [2178] 0.8437500 0.6666667 0.7708333 0.7395833 0.6041667 0.8333333 0.8020833
-## [2185] 0.8750000 0.8854167 0.8333333 0.8645833 0.7083333 0.8020833 0.7500000
-## [2192] 0.8125000 0.7187500 0.7187500 0.8020833 0.7708333 0.8750000 0.7500000
-## [2199] 0.7395833 0.6494845 0.7291667 0.7916667 0.6458333 0.8020833 0.8750000
-## [2206] 0.7395833 0.6145833 0.7500000 0.7142857 0.8020833 0.5937500 0.6666667
-## [2213] 0.8645833 0.6701031 0.8437500 0.7291667 0.7604167 0.6979167 0.7395833
-## [2220] 0.7395833 0.7500000 0.7395833 0.7083333 0.6458333 0.8020833 0.7187500
-## [2227] 0.5833333 0.8020833 0.8125000 0.7395833 0.7083333 0.7916667 0.8854167
-## [2234] 0.6562500 0.6979167 0.8645833 0.6875000 0.8854167 0.6666667 0.7187500
-## [2241] 0.7938144 0.8229167 0.7083333 0.8350515 0.7916667 0.7812500 0.7187500
-## [2248] 0.6979167 0.6145833 0.6875000 0.8020833 0.8333333 0.6875000 0.8645833
-## [2255] 0.7083333 0.6666667 0.6979167 0.8229167 0.7010309 0.7500000 0.7142857
-## [2262] 0.5937500 0.7812500 0.6979167 0.6041667 0.8333333 0.7291667 0.7187500
-## [2269] 0.7835052 0.7525773 0.7916667 0.7500000 0.7708333 0.7291667 0.5625000
-## [2276] 0.7083333 0.7187500 0.8229167 0.6562500 0.7291667 0.5625000 0.7812500
-## [2283] 0.7916667 0.7291667 0.7187500 0.7500000 0.5520833 0.6979167 0.7291667
-## [2290] 0.6770833 0.6562500 0.8333333 0.5520833 0.8437500 0.7604167 0.8541667
-## [2297] 0.7500000 0.7604167 0.6122449 0.7010309 0.6770833 0.6041667 0.7708333
-## [2304] 0.6979167 0.7083333 0.7187500 0.7708333 0.6354167 0.7812500 0.8541667
-## [2311] 0.7916667 0.8333333 0.9062500 0.7708333 0.6770833 0.6250000 0.6875000
-## [2318] 0.7187500 0.7291667 0.5520833 0.5416667 0.5312500 0.8144330 0.7708333
-## [2325] 0.7604167 0.8333333 0.7708333 0.7731959 0.7708333 0.7319588 0.6875000
-## [2332] 0.8125000 0.5257732 0.7500000 0.8437500 0.6458333 0.8020833 0.5520833
-## [2339] 0.8125000 0.7422680 0.8229167 0.6391753 0.6250000 0.6666667 0.7812500
-## [2346] 0.7187500 0.7708333 0.8229167 0.7395833 0.6979167 0.7708333 0.7500000
-## [2353] 0.6666667 0.6666667 0.6979167 0.5729167 0.8020833 0.7083333 0.7708333
-## [2360] 0.8333333 0.7708333 0.7812500 0.6875000 0.7187500 0.7604167 0.7291667
-## [2367] 0.8437500 0.7291667 0.6979167 0.5520833 0.8020833 0.7812500 0.7604167
-## [2374] 0.7604167 0.6666667 0.7083333 0.7812500 0.7291667 0.7291667 0.6250000
-## [2381] 0.6770833 0.7500000 0.6979167 0.7083333 0.7731959 0.7604167 0.7083333
-## [2388] 0.5937500 0.7916667 0.5416667 0.5312500 0.7395833 0.7500000 0.7083333
-## [2395] 0.8854167 0.7187500 0.8333333 0.7395833 0.8854167 0.7812500 0.6458333
-## [2402] 0.6354167 0.7083333 0.6145833 0.7604167 0.7812500 0.6875000 0.7395833
-## [2409] 0.6875000 0.7708333 0.7812500 0.7604167 0.5729167 0.6562500 0.7731959
-## [2416] 0.5773196 0.5000000 0.7604167 0.6250000 0.6979167 0.6458333 0.7395833
-## [2423] 0.7708333 0.6979167 0.7083333 0.6875000 0.6666667 0.7216495 0.5520833
-## [2430] 0.8333333 0.6666667 0.9166667 0.5520833 0.5520833 0.7187500 0.8750000
-## [2437] 0.7500000 0.7500000 0.9166667 0.6145833 0.8125000 0.6666667 0.7187500
-## [2444] 0.6979167 0.7448980 0.7187500 0.7812500 0.7010309 0.7812500 0.7187500
-## [2451] 0.5520833 0.6979167 0.5625000 0.5416667 0.6250000 0.7395833 0.6770833
-## [2458] 0.9375000 0.6979167 0.8229167 0.6979167 0.6458333 0.7604167 0.6145833
-## [2465] 0.7604167 0.6250000 0.7812500 0.6185567 0.7187500 0.5979381 0.8125000
-## [2472] 0.8125000 0.5729167 0.6354167 0.8437500 0.8750000 0.8125000 0.6354167
-## [2479] 0.7708333 0.7291667 0.6979167 0.8125000 0.5520833 0.7083333 0.7187500
-## [2486] 0.8762887 0.7187500 0.8125000 0.7812500 0.7525773 0.7291667 0.7500000
-## [2493] 0.8229167 0.7604167 0.6562500 0.7070707 0.7187500 0.5729167 0.8333333
-## [2500] 0.8125000 0.7291667 0.8854167 0.6562500 0.7291667 0.7812500 0.5773196
-## [2507] 0.6145833 0.6562500 0.7187500 0.7500000 0.7187500 0.8125000 0.7500000
-## [2514] 0.7083333 0.5937500 0.5000000 0.6770833 0.6458333 0.7812500 0.6145833
-## [2521] 0.7083333 0.7708333 0.7070707 0.6562500 0.7395833 0.7395833 0.7187500
-## [2528] 0.7291667 0.6458333 0.7083333 0.5520833 0.8350515 0.7604167 0.8645833
-## [2535] 0.6562500 0.7291667 0.7083333 0.7604167 0.7291667 0.6875000 0.7291667
-## [2542] 0.7291667 0.7291667 0.6979167 0.7083333 0.8750000 0.6666667 0.8229167
-## [2549] 0.7291667 0.6185567 0.6666667 0.6082474 0.8750000 0.6875000 0.8020833
-## [2556] 0.7291667 0.6666667 0.5937500 0.8750000 0.6666667 0.6875000 0.6250000
-## [2563] 0.7187500 0.7812500 0.7291667 0.5312500 0.7291667 0.7916667 0.7604167
-## [2570] 0.7187500 0.6562500 0.5520833 0.6979167 0.6666667 0.8020833 0.7812500
-## [2577] 0.6145833 0.6250000 0.8333333 0.7187500 0.7395833 0.5937500 0.8020833
-## [2584] 0.7083333 0.5833333 0.6979167 0.7395833 0.7422680 0.5520833 0.7395833
-## [2591] 0.8958333 0.7291667 0.5833333 0.6875000 0.6562500 0.5937500 0.6250000
-## [2598] 0.7083333 0.7083333 0.7708333 0.7395833 0.5729167 0.6288660 0.5416667
-## [2605] 0.8020833 0.5625000 0.7500000 0.7708333 0.9166667 0.6875000 0.7291667
-## [2612] 0.6770833 0.7291667 0.7187500 0.7187500 0.6145833 0.5312500 0.6979167
-## [2619] 0.6979167 0.6041667 0.7291667 0.8125000 0.7708333 0.8020833 0.7395833
-## [2626] 0.7500000 0.6770833 0.6354167 0.6979167 0.6666667 0.7187500 0.6354167
-## [2633] 0.8750000 0.6979167 0.7916667 0.7708333 0.7187500 0.6562500 0.6354167
-## [2640] 0.6562500 0.7291667 0.6562500 0.7216495 0.7291667 0.7083333 0.7628866
-## [2647] 0.6530612 0.9062500 0.8453608 0.5416667 0.7916667 0.8437500 0.5520833
-## [2654] 0.7395833 0.7916667 0.6354167 0.5937500 0.6666667 0.7812500 0.7291667
-## [2661] 0.6979167 0.7187500 0.5520833 0.5416667 0.7708333 0.8125000 0.7916667
-## [2668] 0.6562500 0.8333333 0.6979167 0.7500000 0.7525773 0.8229167 0.7395833
-## [2675] 0.7708333 0.6979167 0.6979167 0.7604167 0.5625000 0.5312500 0.7708333
-## [2682] 0.7395833 0.7395833 0.6770833 0.7083333 0.7708333 0.7291667 0.8125000
-## [2689] 0.7708333 0.6666667 0.6458333 0.8125000 0.7500000 0.6875000 0.7083333
-## [2696] 0.6979167 0.6770833 0.6562500 0.7708333 0.6875000 0.7916667 0.7708333
-## [2703] 0.6562500 0.5520833 0.7604167 0.7604167 0.6666667 0.7291667 0.7395833
-## [2710] 0.7500000 0.7187500 0.8125000 0.7708333 0.6458333 0.6875000 0.7083333
-## [2717] 0.6979167 0.5416667 0.6041667 0.7291667 0.6041667 0.6979167 0.7604167
-## [2724] 0.5729167 0.6875000 0.6562500 0.7835052 0.7187500 0.7083333 0.6979167
-## [2731] 0.6979167 0.7291667 0.7395833 0.8125000 0.7319588 0.6770833 0.6770833
-## [2738] 0.7291667 0.7708333 0.7708333 0.7708333 0.7187500 0.5520833 0.6875000
-## [2745] 0.6041667 0.7395833 0.7291667 0.5625000 0.7083333 0.7187500 0.6041667
-## [2752] 0.7395833 0.7187500 0.7083333 0.6562500 0.6666667 0.6666667 0.7291667
-## [2759] 0.6701031
-## Levels: 0 1 2</code></pre>
+##    [1] 0.6979167 0.7500000 0.8437500 0.7500000 0.8333333 0.8645833 0.5773196
+##    [8] 0.7755102 0.6391753 0.7083333 0.7708333 0.8229167 0.5773196 0.7812500
+##   [15] 0.6562500 0.7708333 0.7083333 0.9375000 0.6250000 0.5625000 0.7395833
+##   [22] 0.7395833 0.7708333 0.6145833 0.7187500 0.7812500 0.8333333 0.8125000
+##   [29] 0.7395833 0.8333333 0.7395833 0.7187500 0.8333333 0.6082474 0.8854167
+##   [36] 0.8020833 0.5625000 0.6224490 0.8854167 0.8333333 0.8854167 0.8125000
+##   [43] 0.8229167 0.8333333 0.6875000 0.8333333 0.8958333 0.7916667 0.8229167
+##   [50] 0.6082474 0.8125000 0.8333333 0.7708333 0.7604167 0.7916667 0.8541667
+##   [57] 0.8541667 0.8125000 0.8958333 0.7087379 0.5625000 0.7395833 0.9375000
+##   [64] 0.7291667 0.8645833 0.7916667 0.8437500 0.8333333 0.7395833 0.8333333
+##   [71] 0.7500000 0.6666667 0.7708333 0.9166667 0.7708333 0.9166667 0.9062500
+##   [78] 0.7500000 0.8958333 0.6770833 0.6979167 0.8645833 0.8762887 0.5520833
+##   [85] 0.8333333 0.6458333 0.6875000 0.8750000 0.7708333 0.6979167 0.6701031
+##   [92] 0.8333333 0.8020833 0.8437500 0.8854167 0.8437500 0.6875000 0.6597938
+##   [99] 0.7938144 0.7083333 0.7708333 0.6041667 0.7500000 0.8333333 0.6666667
+##  [106] 0.7500000 0.9583333 0.8125000 0.8437500 0.7395833 0.8020833 0.8020833
+##  [113] 0.6979167 0.6185567 0.7083333 0.6250000 0.8645833 0.5937500 0.8229167
+##  [120] 0.7083333 0.8437500 0.8333333 0.6354167 0.8125000 0.8645833 0.7708333
+##  [127] 0.6562500 0.6875000 0.9062500 0.6597938 0.8437500 0.7395833 0.8854167
+##  [134] 0.7291667 0.7812500 0.8333333 0.7187500 0.6458333 0.8437500 0.6979167
+##  [141] 0.7395833 0.8041237 0.8125000 0.8125000 0.7708333 0.7604167 0.7500000
+##  [148] 0.7291667 0.5625000 0.8229167 0.6666667 0.8958333 0.8020833 0.8333333
+##  [155] 0.7604167 0.7812500 0.8125000 0.7083333 0.7916667 0.7916667 0.8958333
+##  [162] 0.7916667 0.8854167 0.7708333 0.7083333 0.6979167 0.7291667 0.7812500
+##  [169] 0.8750000 0.8020833 0.6354167 0.8333333 0.6145833 0.7187500 0.7812500
+##  [176] 0.7812500 0.7812500 0.8854167 0.7708333 0.8645833 0.6666667 0.6458333
+##  [183] 0.7916667 0.8020833 0.7500000 0.7395833 0.7083333 0.7395833 0.7395833
+##  [190] 0.8541667 0.7916667 0.7916667 0.7500000 0.8750000 0.7083333 0.8645833
+##  [197] 0.6770833 0.7916667 0.7291667 0.8333333 0.7525773 0.8020833 0.7604167
+##  [204] 0.8854167 0.6875000 0.7916667 0.7708333 0.7604167 0.7083333 0.7291667
+##  [211] 0.7604167 0.7400000 0.6562500 0.7708333 0.6979167 0.7708333 0.7812500
+##  [218] 0.6979167 0.8333333 0.5833333 0.7187500 0.8020833 0.5208333 0.6458333
+##  [225] 0.8645833 0.5625000 0.6494845 0.8229167 0.7708333 0.8333333 0.8333333
+##  [232] 0.7291667 0.6562500 0.6804124 0.7916667 0.7604167 0.8854167 0.6701031
+##  [239] 0.7187500 0.8229167 0.7083333 0.7500000 0.7708333 0.7916667 0.8229167
+##  [246] 0.7916667 0.8437500 0.5416667 0.8229167 0.7708333 0.7291667 0.7916667
+##  [253] 0.8437500 0.7604167 0.6562500 0.7812500 0.7812500 0.7604167 0.6145833
+##  [260] 0.7083333 0.6979167 0.8645833 0.8247423 0.6875000 0.9166667 0.6875000
+##  [267] 0.7812500 0.8229167 0.7083333 0.8229167 0.6770833 0.8125000 0.6354167
+##  [274] 0.7604167 0.6145833 0.7272727 0.8958333 0.6562500 0.8645833 0.8865979
+##  [281] 0.5416667 0.7938144 0.7708333 0.7916667 0.6145833 0.7500000 0.6562500
+##  [288] 0.5416667 0.8437500 0.7291667 0.8333333 0.7916667 0.7395833 0.8958333
+##  [295] 0.6875000 0.7812500 0.8125000 0.6666667 0.6354167 0.7812500 0.8020833
+##  [302] 0.7708333 0.6770833 0.7604167 0.8645833 0.8125000 0.6770833 0.8437500
+##  [309] 0.5729167 0.6145833 0.7395833 0.8041237 0.9479167 0.7187500 0.7812500
+##  [316] 0.8229167 0.6354167 0.6979167 0.6354167 0.7291667 0.7083333 0.8125000
+##  [323] 0.7812500 0.8958333 0.7083333 0.8020833 0.7187500 0.8333333 0.8865979
+##  [330] 0.7291667 0.8125000 0.8020833 0.7916667 0.8020833 0.5729167 0.7604167
+##  [337] 0.7708333 0.8333333 0.7395833 0.8041237 0.8125000 0.8541667 0.8333333
+##  [344] 0.7812500 0.6979167 0.6979167 0.9062500 0.6458333 0.8645833 0.7916667
+##  [351] 0.7395833 0.9062500 0.7604167 0.6666667 0.6875000 0.7812500 0.7187500
+##  [358] 0.8229167 0.5000000 0.8229167 0.5000000 0.7604167 0.8437500 0.8645833
+##  [365] 0.6354167 0.7083333 0.7187500 0.6979167 0.9062500 0.6562500 0.7010309
+##  [372] 0.9062500 0.6597938 0.6288660 0.7187500 0.7500000 0.8125000 0.9166667
+##  [379] 0.5729167 0.7604167 0.8865979 0.5729167 0.8144330 0.8229167 0.6770833
+##  [386] 0.7291667 0.7812500 0.7604167 0.7604167 0.7083333 0.7291667 0.7916667
+##  [393] 0.7395833 0.7500000 0.7083333 0.7708333 0.7187500 0.6875000 0.7812500
+##  [400] 0.7500000 0.8958333 0.7395833 0.6770833 0.7500000 0.8333333 0.7400000
+##  [407] 0.7812500 0.8020833 0.5416667 0.7395833 0.7187500 0.6224490 0.7395833
+##  [414] 0.7291667 0.6979167 0.9062500 0.7291667 0.7916667 0.6770833 0.7187500
+##  [421] 0.7395833 0.7708333 0.7604167 0.7812500 0.6562500 0.6979167 0.7040816
+##  [428] 0.6145833 0.8020833 0.6562500 0.7812500 0.8645833 0.7916667 0.7938144
+##  [435] 0.6875000 0.7422680 0.5937500 0.7395833 0.7187500 0.5520833 0.7500000
+##  [442] 0.7812500 0.7291667 0.8541667 0.6979167 0.9166667 0.7187500 0.6458333
+##  [449] 0.8020833 0.7708333 0.8645833 0.8333333 0.5312500 0.7916667 0.5520833
+##  [456] 0.7500000 0.5729167 0.9062500 0.7812500 0.5773196 0.6875000 0.8854167
+##  [463] 0.6770833 0.6354167 0.8020833 0.8958333 0.7604167 0.8020833 0.6458333
+##  [470] 0.8958333 0.7708333 0.7604167 0.7604167 0.6979167 0.8020833 0.7708333
+##  [477] 0.9166667 0.7708333 0.9062500 0.7083333 0.8229167 0.7708333 0.7916667
+##  [484] 0.7291667 0.7708333 0.9375000 0.7395833 0.7395833 0.8453608 0.8020833
+##  [491] 0.8854167 0.7708333 0.8333333 0.6875000 0.8247423 0.8333333 0.8645833
+##  [498] 0.6562500 0.6250000 0.8333333 0.7916667 0.6458333 0.7812500 0.7604167
+##  [505] 0.6770833 0.8750000 0.8020833 0.7708333 0.5520833 0.7604167 0.9166667
+##  [512] 0.7395833 0.6875000 0.7604167 0.6770833 0.7187500 0.6666667 0.9062500
+##  [519] 0.7812500 0.8125000 0.7187500 0.7346939 0.8969072 0.8750000 0.7291667
+##  [526] 0.8645833 0.7916667 0.5833333 0.6770833 0.7604167 0.8020833 0.6666667
+##  [533] 0.7500000 0.7708333 0.6979167 0.8229167 0.6875000 0.6145833 0.9072165
+##  [540] 0.8541667 0.7291667 0.7187500 0.9166667 0.7291667 0.7083333 0.8020833
+##  [547] 0.8333333 0.7916667 0.6979167 0.7916667 0.8645833 0.7604167 0.7395833
+##  [554] 0.7187500 0.7395833 0.7187500 0.8125000 0.6770833 0.7604167 0.8854167
+##  [561] 0.8854167 0.8541667 0.7187500 0.7916667 0.8333333 0.7395833 0.6562500
+##  [568] 0.7916667 0.8229167 0.6979167 0.9278351 0.8020833 0.6354167 0.7812500
+##  [575] 0.8333333 0.8020833 0.7395833 0.7395833 0.8125000 0.7708333 0.6979167
+##  [582] 0.6770833 0.7916667 0.8645833 0.7708333 0.7291667 0.7187500 0.8854167
+##  [589] 0.8333333 0.8333333 0.6666667 0.7812500 0.8333333 0.7291667 0.6562500
+##  [596] 0.6979167 0.7708333 0.7916667 0.7708333 0.8541667 0.7938144 0.7708333
+##  [603] 0.7812500 0.7708333 0.8750000 0.8645833 0.6562500 0.6250000 0.6770833
+##  [610] 0.7395833 0.8958333 0.7916667 0.7812500 0.6562500 0.7187500 0.7422680
+##  [617] 0.6250000 0.6979167 0.6875000 0.7525773 0.8229167 0.8229167 0.8020833
+##  [624] 0.7916667 0.7395833 0.7812500 0.6666667 0.6666667 0.7500000 0.6041667
+##  [631] 0.7083333 0.7812500 0.6562500 0.8645833 0.6979167 0.8645833 0.8125000
+##  [638] 0.8437500 0.7500000 0.8125000 0.8333333 0.8125000 0.8229167 0.8020833
+##  [645] 0.8020833 0.8020833 0.8958333 0.6666667 0.6562500 0.7395833 0.7500000
+##  [652] 0.7500000 0.9375000 0.8020833 0.8854167 0.6875000 0.8125000 0.7708333
+##  [659] 0.7653061 0.7395833 0.5937500 0.8020833 0.8854167 0.7083333 0.5520833
+##  [666] 0.8125000 0.8229167 0.7272727 0.7187500 0.6145833 0.8020833 0.8958333
+##  [673] 0.8958333 0.7083333 0.7604167 0.7708333 0.8229167 0.8333333 0.8645833
+##  [680] 0.7291667 0.6145833 0.8437500 0.8125000 0.7187500 0.7083333 0.8229167
+##  [687] 0.8854167 0.7916667 0.8750000 0.7291667 0.6666667 0.8125000 0.7708333
+##  [694] 0.6875000 0.8125000 0.8020833 0.7395833 0.7422680 0.7500000 0.6041667
+##  [701] 0.6354167 0.6770833 0.6562500 0.5729167 0.7395833 0.6562500 0.7395833
+##  [708] 0.6875000 0.7500000 0.6666667 0.8125000 0.6666667 0.8659794 0.9270833
+##  [715] 0.8958333 0.7604167 0.5625000 0.7395833 0.7812500 0.8750000 0.5520833
+##  [722] 0.7604167 0.7083333 0.8020833 0.8144330 0.6875000 0.6979167 0.7395833
+##  [729] 0.7812500 0.8229167 0.7187500 0.7422680 0.7291667 0.8854167 0.6979167
+##  [736] 0.7216495 0.6875000 0.5416667 0.6804124 0.8229167 0.7395833 0.6562500
+##  [743] 0.7604167 0.8750000 0.7187500 0.9062500 0.5833333 0.7187500 0.7083333
+##  [750] 0.8125000 0.8750000 0.7083333 0.7604167 0.6979167 0.6875000 0.8958333
+##  [757] 0.7916667 0.6979167 0.6458333 0.8854167 0.8333333 0.8020833 0.8854167
+##  [764] 0.7812500 0.6666667 0.8750000 0.7604167 0.7395833 0.6145833 0.7040816
+##  [771] 0.8125000 0.7291667 0.6666667 0.6979167 0.6354167 0.5625000 0.8958333
+##  [778] 0.8333333 0.8854167 0.7812500 0.7187500 0.7187500 0.7916667 0.9175258
+##  [785] 0.8854167 0.7187500 0.8333333 0.7291667 0.8041237 0.8125000 0.8333333
+##  [792] 0.8041237 0.8020833 0.8958333 0.6562500 0.7812500 0.6979167 0.8645833
+##  [799] 0.8125000 0.7083333 0.6666667 0.7083333 0.6979167 0.8020833 0.6804124
+##  [806] 0.8125000 0.6875000 0.8020833 0.7812500 0.7500000 0.6391753 0.7187500
+##  [813] 0.8229167 0.8333333 0.5670103 0.8750000 0.8020833 0.7916667 0.7812500
+##  [820] 0.6875000 0.6562500 0.8020833 0.8750000 0.8125000 0.7916667 0.7708333
+##  [827] 0.7604167 0.8125000 0.7291667 0.7708333 0.7500000 0.6875000 0.7291667
+##  [834] 0.5729167 0.8958333 0.7916667 0.6458333 0.8229167 0.8125000 0.6875000
+##  [841] 0.6666667 0.6666667 0.6597938 0.7083333 0.7187500 0.8437500 0.8125000
+##  [848] 0.8333333 0.8020833 0.8437500 0.6979167 0.7346939 0.7708333 0.8125000
+##  [855] 0.8229167 0.8125000 0.8125000 0.8333333 0.7500000 0.8125000 0.5520833
+##  [862] 0.7500000 0.7187500 0.7291667 0.7604167 0.7708333 0.6458333 0.6770833
+##  [869] 0.7500000 0.6875000 0.8437500 0.7604167 0.6354167 0.7500000 0.7812500
+##  [876] 0.7812500 0.6770833 0.9166667 0.8958333 0.8229167 0.8229167 0.8020833
+##  [883] 0.7291667 0.7708333 0.7916667 0.7812500 0.8437500 0.8762887 0.6770833
+##  [890] 0.8229167 0.7319588 0.9270833 0.9270833 0.8437500 0.7395833 0.8020833
+##  [897] 0.7395833 0.7083333 0.7812500 0.7500000 0.8437500 0.8854167 0.8762887
+##  [904] 0.6875000 0.7395833 0.7604167 0.6875000 0.7604167 0.7500000 0.6804124
+##  [911] 0.7395833 0.7187500 0.7083333 0.7500000 0.6666667 0.7083333 0.7708333
+##  [918] 0.7083333 0.7291667 0.8958333 0.7708333 0.8125000 0.6770833 0.5833333
+##  [925] 0.6666667 0.6145833 0.8020833 0.7916667 0.8229167 0.6875000 0.8437500
+##  [932] 0.7395833 0.7916667 0.7604167 0.7500000 0.7916667 0.7812500 0.7187500
+##  [939] 0.8750000 0.8333333 0.8020833 0.7708333 0.8854167 0.6354167 0.8125000
+##  [946] 0.6875000 0.7083333 0.6979167 0.6354167 0.7812500 0.8333333 0.8958333
+##  [953] 0.8333333 0.7604167 0.6041667 0.8229167 0.8437500 0.7604167 0.8541667
+##  [960] 0.6562500 0.8958333 0.9166667 0.5625000 0.8020833 0.7708333 0.7708333
+##  [967] 0.7812500 0.7187500 0.7708333 0.8125000 0.8229167 0.8333333 0.6875000
+##  [974] 0.7604167 0.8125000 0.7916667 0.5520833 0.6770833 0.7812500 0.7812500
+##  [981] 0.6562500 0.6562500 0.5937500 0.7812500 0.7604167 0.6562500 0.8750000
+##  [988] 0.8541667 0.8958333 0.6458333 0.6562500 0.8125000 0.7291667 0.7307692
+##  [995] 0.8125000 0.8541667 0.9166667 0.6250000 0.7083333 0.8333333 0.7708333
+## [1002] 0.7500000 0.8437500 0.8333333 0.6562500 0.6875000 0.6875000 0.8854167
+## [1009] 0.7708333 0.6979167 0.7291667 0.8645833 0.7187500 0.8229167 0.7187500
+## [1016] 0.6770833 0.7916667 0.8020833 0.8645833 0.7916667 0.7291667 0.7604167
+## [1023] 0.7916667 0.7500000 0.7812500 0.8229167 0.8645833 0.6875000 0.6875000
+## [1030] 0.8854167 0.8541667 0.7395833 0.7083333 0.6250000 0.5567010 0.7812500
+## [1037] 0.7916667 0.6875000 0.7291667 0.7835052 0.8229167 0.5937500 0.7291667
+## [1044] 0.7938144 0.8645833 0.7708333 0.7916667 0.7422680 0.6666667 0.7395833
+## [1051] 0.8645833 0.6875000 0.8437500 0.6250000 0.7319588 0.6875000 0.5306122
+## [1058] 0.5625000 0.7187500 0.6979167 0.8125000 0.9062500 0.6875000 0.8125000
+## [1065] 0.7500000 0.8333333 0.7604167 0.8125000 0.8437500 0.7187500 0.6354167
+## [1072] 0.7604167 0.7395833 0.9175258 0.7216495 0.7187500 0.6979167 0.7395833
+## [1079] 0.7187500 0.8020833 0.8645833 0.6354167 0.8333333 0.7187500 0.8125000
+## [1086] 0.7812500 0.7708333 0.8229167 0.8229167 0.7291667 0.8437500 0.5520833
+## [1093] 0.9583333 0.8020833 0.7916667 0.8854167 0.7187500 0.8854167 0.6979167
+## [1100] 0.8958333 0.9270833 0.8437500 0.7708333 0.7083333 0.7291667 0.8020833
+## [1107] 0.7500000 0.7812500 0.6770833 0.7812500 0.7500000 0.7916667 0.6666667
+## [1114] 0.8437500 0.7604167 0.8541667 0.7187500 0.6770833 0.8750000 0.8958333
+## [1121] 0.7916667 0.7291667 0.8541667 0.6354167 0.5816327 0.7083333 0.6041667
+## [1128] 0.8125000 0.6354167 0.7812500 0.6250000 0.7708333 0.7422680 0.7916667
+## [1135] 0.7395833 0.7812500 0.8125000 0.9166667 0.7812500 0.8645833 0.6875000
+## [1142] 0.8854167 0.7500000 0.6979167 0.8958333 0.7604167 0.8333333 0.7187500
+## [1149] 0.8229167 0.7395833 0.8437500 0.7812500 0.7708333 0.8958333 0.7916667
+## [1156] 0.7708333 0.6458333 0.8020833 0.7916667 0.8645833 0.8229167 0.8333333
+## [1163] 0.7187500 0.8437500 0.8229167 0.7525773 0.8125000 0.7395833 0.7916667
+## [1170] 0.6041667 0.7187500 0.7708333 0.7938144 0.7708333 0.7113402 0.8854167
+## [1177] 0.7083333 0.7604167 0.7083333 0.8020833 0.7604167 0.7812500 0.6458333
+## [1184] 0.7083333 0.6041667 0.9062500 0.7916667 0.5937500 0.6354167 0.8125000
+## [1191] 0.8333333 0.6666667 0.8854167 0.7216495 0.7083333 0.8229167 0.8247423
+## [1198] 0.8958333 0.7812500 0.8854167 0.8750000 0.8125000 0.8958333 0.7395833
+## [1205] 0.6562500 0.8333333 0.7083333 0.7500000 0.8854167 0.9166667 0.7187500
+## [1212] 0.7291667 0.7604167 0.6666667 0.6562500 0.8333333 0.6979167 0.7525773
+## [1219] 0.8125000 0.7500000 0.7604167 0.8229167 0.7708333 0.7395833 0.8541667
+## [1226] 0.7187500 0.6666667 0.7500000 0.7083333 0.7422680 0.8020833 0.6458333
+## [1233] 0.7187500 0.7708333 0.8437500 0.6666667 0.8750000 0.6041667 0.6979167
+## [1240] 0.6666667 0.9062500 0.7812500 0.8541667 0.9062500 0.6041667 0.8437500
+## [1247] 0.6597938 0.8958333 0.7500000 0.7500000 0.8541667 0.7916667 0.7500000
+## [1254] 0.5937500 0.8229167 0.8437500 0.8125000 0.7916667 0.7604167 0.6875000
+## [1261] 0.6562500 0.9166667 0.7708333 0.8750000 0.7812500 0.5416667 0.8229167
+## [1268] 0.8437500 0.8645833 0.7083333 0.7500000 0.8958333 0.7500000 0.7187500
+## [1275] 0.7812500 0.7812500 0.6979167 0.8333333 0.7708333 0.8541667 0.7395833
+## [1282] 0.7916667 0.8854167 0.8541667 0.8854167 0.5520833 0.8125000 0.6458333
+## [1289] 0.6354167 0.7604167 0.8229167 0.6494845 0.8854167 0.8333333 0.8229167
+## [1296] 0.7604167 0.6666667 0.8854167 0.8020833 0.7291667 0.8125000 0.6979167
+## [1303] 0.7916667 0.7812500 0.8333333 0.7812500 0.6804124 0.7187500 0.7187500
+## [1310] 0.7708333 0.8750000 0.6562500 0.7812500 0.8229167 0.7525773 0.6875000
+## [1317] 0.8645833 0.7187500 0.6666667 0.6979167 0.7812500 0.8333333 0.7187500
+## [1324] 0.6666667 0.7812500 0.6562500 0.7708333 0.7395833 0.7291667 0.7395833
+## [1331] 0.8020833 0.8229167 0.7916667 0.8645833 0.8333333 0.9062500 0.7708333
+## [1338] 0.8437500 0.7187500 0.7916667 0.8333333 0.8125000 0.8229167 0.6145833
+## [1345] 0.7708333 0.8958333 0.8020833 0.8750000 0.7604167 0.7604167 0.7812500
+## [1352] 0.7187500 0.8020833 0.7916667 0.6250000 0.6875000 0.7187500 0.8854167
+## [1359] 0.6458333 0.8125000 0.5625000 0.8645833 0.8020833 0.6458333 0.7083333
+## [1366] 0.7291667 0.7708333 0.9166667 0.7916667 0.7604167 0.6770833 0.6770833
+## [1373] 0.7916667 0.6770833 0.7291667 0.8125000 0.7500000 0.7291667 0.7916667
+## [1380] 0.7628866 0.8020833 0.8958333 0.8969072 0.7187500 0.8854167 0.7916667
+## [1387] 0.8020833 0.8125000 0.7291667 0.8437500 0.8125000 0.5312500 0.8854167
+## [1394] 0.7083333 0.7812500 0.9270833 0.7083333 0.7291667 0.6666667 0.7604167
+## [1401] 0.8645833 0.7812500 0.8750000 0.7708333 0.6562500 0.8958333 0.8750000
+## [1408] 0.7916667 0.6770833 0.7916667 0.7187500 0.8541667 0.8333333 0.8125000
+## [1415] 0.7083333 0.6458333 0.8958333 0.7812500 0.7812500 0.8125000 0.8125000
+## [1422] 0.6562500 0.7500000 0.5520833 0.8750000 0.7916667 0.7812500 0.7395833
+## [1429] 0.7916667 0.6979167 0.7083333 0.8229167 0.8020833 0.8333333 0.7812500
+## [1436] 0.8125000 0.8437500 0.8645833 0.6875000 0.7291667 0.6458333 0.6979167
+## [1443] 0.8958333 0.8125000 0.8645833 0.6354167 0.8958333 0.7395833 0.7422680
+## [1450] 0.8645833 0.7500000 0.8750000 0.7083333 0.6979167 0.8229167 0.6796117
+## [1457] 0.7628866 0.7916667 0.7083333 0.7500000 0.7083333 0.8333333 0.7731959
+## [1464] 0.7708333 0.6875000 0.8958333 0.6979167 0.7187500 0.7500000 0.8125000
+## [1471] 0.8750000 0.7395833 0.8437500 0.6979167 0.5520833 0.5520833 0.7395833
+## [1478] 0.7187500 0.8229167 0.8958333 0.8750000 0.6979167 0.7291667 0.7291667
+## [1485] 0.6770833 0.6875000 0.7187500 0.7916667 0.6979167 0.8229167 0.6770833
+## [1492] 0.7812500 0.6458333 0.7422680 0.8229167 0.7812500 0.8020833 0.7708333
+## [1499] 0.7604167 0.8854167 0.7395833 0.8333333 0.6875000 0.7708333 0.7812500
+## [1506] 0.8750000 0.8645833 0.6562500 0.9375000 0.5625000 0.8645833 0.8437500
+## [1513] 0.8541667 0.8645833 0.8333333 0.6770833 0.8333333 0.7708333 0.8125000
+## [1520] 0.7395833 0.8125000 0.9270833 0.8541667 0.8229167 0.5416667 0.7916667
+## [1527] 0.8229167 0.5104167 0.5833333 0.7708333 0.8541667 0.8144330 0.7113402
+## [1534] 0.9062500 0.8958333 0.8333333 0.7604167 0.8125000 0.8020833 0.7291667
+## [1541] 0.8125000 0.7916667 0.6875000 0.7604167 0.8645833 0.8645833 0.7916667
+## [1548] 0.6562500 0.8750000 0.7083333 0.6391753 0.7187500 0.6875000 0.8125000
+## [1555] 0.6875000 0.6666667 0.7500000 0.9166667 0.8229167 0.6666667 0.6250000
+## [1562] 0.7395833 0.7812500 0.6458333 0.8333333 0.7812500 0.7708333 0.8144330
+## [1569] 0.7812500 0.7395833 0.7500000 0.8437500 0.5312500 0.5625000 0.8333333
+## [1576] 0.5625000 0.8333333 0.8645833 0.7812500 0.8229167 0.5104167 0.8541667
+## [1583] 0.7083333 0.7708333 0.5312500 0.8541667 0.7187500 0.6875000 0.7812500
+## [1590] 0.9062500 0.7500000 0.5625000 0.8020833 0.6562500 0.7708333 0.6770833
+## [1597] 0.6979167 0.8229167 0.7395833 0.8437500 0.8437500 0.8125000 0.8854167
+## [1604] 0.6666667 0.8437500 0.6145833 0.8437500 0.7604167 0.7812500 0.7604167
+## [1611] 0.7708333 0.8958333 0.6979167 0.7916667 0.7812500 0.8750000 0.7395833
+## [1618] 0.5625000 0.6562500 0.8229167 0.6354167 0.6979167 0.8333333 0.9062500
+## [1625] 0.6458333 0.8125000 0.7500000 0.8750000 0.9375000 0.8020833 0.8958333
+## [1632] 0.8437500 0.8854167 0.6597938 0.7500000 0.8020833 0.9166667 0.6041667
+## [1639] 0.9270833 0.8125000 0.8958333 0.5000000 0.8020833 0.8020833 0.8854167
+## [1646] 0.6979167 0.5979381 0.8958333 0.8958333 0.7812500 0.7010309 0.5312500
+## [1653] 0.7916667 0.6979167 0.8125000 0.8333333 0.8958333 0.7187500 0.5416667
+## [1660] 0.7916667 0.9062500 0.6979167 0.7395833 0.5416667 0.6458333 0.8020833
+## [1667] 0.6145833 0.7812500 0.6770833 0.6875000 0.8437500 0.5520833 0.7083333
+## [1674] 0.8854167 0.6770833 0.7604167 0.7938144 0.6875000 0.7916667 0.7916667
+## [1681] 0.7708333 0.7551020 0.8229167 0.8541667 0.6562500 0.6770833 0.6770833
+## [1688] 0.5625000 0.8645833 0.7291667 0.6979167 0.7812500 0.7812500 0.8229167
+## [1695] 0.8645833 0.7291667 0.8020833 0.7083333 0.5833333 0.6770833 0.8854167
+## [1702] 0.8125000 0.7187500 0.6354167 0.7812500 0.7083333 0.7916667 0.8958333
+## [1709] 0.8020833 0.7422680 0.8333333 0.9062500 0.6458333 0.6354167 0.8645833
+## [1716] 0.7916667 0.8020833 0.8229167 0.6979167 0.8020833 0.7708333 0.7812500
+## [1723] 0.7708333 0.7500000 0.7395833 0.5625000 0.8750000 0.7291667 0.7916667
+## [1730] 0.7916667 0.6354167 0.8229167 0.8645833 0.6875000 0.8854167 0.8645833
+## [1737] 0.6458333 0.7916667 0.5416667 0.6875000 0.7916667 0.6250000 0.7500000
+## [1744] 0.8437500 0.6666667 0.6494845 0.7604167 0.6041667 0.8750000 0.7187500
+## [1751] 0.8229167 0.7500000 0.8854167 0.8333333 0.7291667 0.5312500 0.7938144
+## [1758] 0.6666667 0.7187500 0.7628866 0.7708333 0.7812500 0.8020833 0.7216495
+## [1765] 0.8437500 0.8020833 0.6875000 0.7291667 0.6354167 0.8125000 0.5312500
+## [1772] 0.7500000 0.6770833 0.7812500 0.7187500 0.7083333 0.8333333 0.8020833
+## [1779] 0.6979167 0.8541667 0.7916667 0.7938144 0.8020833 0.8437500 0.7291667
+## [1786] 0.8125000 0.7187500 0.8958333 0.5312500 0.6666667 0.8541667 0.6875000
+## [1793] 0.6145833 0.7628866 0.8645833 0.7604167 0.6666667 0.6458333 0.7187500
+## [1800] 0.8229167 0.7500000 0.8125000 0.6770833 0.7187500 0.6979167 0.5520833
+## [1807] 0.7187500 0.7187500 0.7812500 0.7604167 0.6562500 0.8333333 0.8229167
+## [1814] 0.5312500 0.8645833 0.7083333 0.7708333 0.8333333 0.7244898 0.9166667
+## [1821] 0.8750000 0.6041667 0.8333333 0.7676768 0.6907216 0.7291667 0.8541667
+## [1828] 0.7604167 0.6145833 0.6770833 0.8541667 0.7291667 0.6875000 0.7812500
+## [1835] 0.6979167 0.9062500 0.5729167 0.8645833 0.6250000 0.6875000 0.7916667
+## [1842] 0.7916667 0.7500000 0.7187500 0.7812500 0.7812500 0.6979167 0.7395833
+## [1849] 0.7500000 0.8229167 0.7916667 0.8645833 0.7500000 0.6875000 0.7395833
+## [1856] 0.7938144 0.9270833 0.6979167 0.8020833 0.5312500 0.7500000 0.8020833
+## [1863] 0.6979167 0.8541667 0.7916667 0.7291667 0.8750000 0.7812500 0.9062500
+## [1870] 0.7708333 0.7395833 0.6770833 0.8645833 0.8541667 0.7708333 0.8333333
+## [1877] 0.8958333 0.7812500 0.7187500 0.9166667 0.7916667 0.8437500 0.6875000
+## [1884] 0.7187500 0.7187500 0.7113402 0.5937500 0.7291667 0.8750000 0.7916667
+## [1891] 0.8645833 0.7010309 0.8969072 0.7916667 0.7083333 0.8750000 0.8125000
+## [1898] 0.7916667 0.8645833 0.8020833 0.6145833 0.8229167 0.9062500 0.8645833
+## [1905] 0.7916667 0.8541667 0.7395833 0.8125000 0.6562500 0.6770833 0.8229167
+## [1912] 0.7291667 0.7083333 0.8229167 0.6666667 0.7916667 0.5625000 0.6770833
+## [1919] 0.8125000 0.5312500 0.8437500 0.7812500 0.8229167 0.8350515 0.8854167
+## [1926] 0.7604167 0.6041667 0.6041667 0.6041667 0.8854167 0.7916667 0.7812500
+## [1933] 0.7500000 0.7291667 0.6562500 0.7812500 0.7395833 0.8125000 0.6979167
+## [1940] 0.7835052 0.7708333 0.7916667 0.7187500 0.7291667 0.7083333 0.6354167
+## [1947] 0.9175258 0.7187500 0.7187500 0.7500000 0.7187500 0.7916667 0.5937500
+## [1954] 0.7291667 0.8125000 0.7812500 0.5900000 0.9062500 0.7319588 0.7708333
+## [1961] 0.8854167 0.8125000 0.7916667 0.8750000 0.8125000 0.7291667 0.7083333
+## [1968] 0.6666667 0.7500000 0.9375000 0.7812500 0.7857143 0.7916667 0.6666667
+## [1975] 0.8958333 0.7812500 0.6666667 0.7291667 0.8350515 0.8020833 0.6494845
+## [1982] 0.7291667 0.7500000 0.6354167 0.7731959 0.8437500 0.7291667 0.8645833
+## [1989] 0.6770833 0.8750000 0.7731959 0.8958333 0.8958333 0.8437500 0.7731959
+## [1996] 0.8750000 0.9375000 0.6770833 0.7812500 0.7395833 0.7083333 0.6562500
+## [2003] 0.7083333 0.7395833 0.7010309 0.8541667 0.7083333 0.6562500 0.6770833
+## [2010] 0.9175258 0.7500000 0.8020833 0.6770833 0.8020833 0.8437500 0.6875000
+## [2017] 0.8333333 0.7187500 0.7083333 0.8437500 0.8229167 0.6770833 0.7395833
+## [2024] 0.7916667 0.7708333 0.6875000 0.8229167 0.6354167 0.8645833 0.5625000
+## [2031] 0.7291667 0.7938144 0.7291667 0.9062500 0.6666667 0.8125000 0.6145833
+## [2038] 0.8437500 0.8229167 0.8350515 0.7395833 0.6354167 0.8437500 0.5416667
+## [2045] 0.6979167 0.7604167 0.7708333 0.6770833 0.7500000 0.7812500 0.6250000
+## [2052] 0.7916667 0.9062500 0.6041667 0.7812500 0.9062500 0.6979167 0.6041667
+## [2059] 0.6770833 0.6875000 0.6875000 0.6979167 0.7395833 0.8958333 0.9270833
+## [2066] 0.8437500 0.7812500 0.8020833 0.8229167 0.8229167 0.7010309 0.8229167
+## [2073] 0.8020833 0.6979167 0.7083333 0.8229167 0.9375000 0.7500000 0.6666667
+## [2080] 0.7500000 0.7291667 0.7187500 0.7604167 0.7916667 0.6979167 0.9062500
+## [2087] 0.7187500 0.7083333 0.6666667 0.6354167 0.6979167 0.6875000 0.7395833
+## [2094] 0.5729167 0.7500000 0.8125000 0.8437500 0.7708333 0.6391753 0.7812500
+## [2101] 0.6250000 0.8854167 0.7083333 0.6145833 0.8645833 0.6666667 0.7083333
+## [2108] 0.7187500 0.8437500 0.6979167 0.7916667 0.5625000 0.6666667 0.8020833
+## [2115] 0.8437500 0.8541667 0.8125000 0.9278351 0.7604167 0.8541667 0.7604167
+## [2122] 0.8020833 0.6979167 0.7916667 0.7083333 0.8541667 0.8541667 0.6979167
+## [2129] 0.7708333 0.6701031 0.5833333 0.7604167 0.7216495 0.7708333 0.6458333
+## [2136] 0.7916667 0.7083333 0.6979167 0.7916667 0.7083333 0.7812500 0.9270833
+## [2143] 0.6145833 0.7187500 0.7395833 0.8541667 0.7083333 0.8333333 0.7422680
+## [2150] 0.7812500 0.5937500 0.7395833 0.6041667 0.8453608 0.8333333 0.7395833
+## [2157] 0.8333333 0.7113402 0.7187500 0.8541667 0.8020833 0.8125000 0.8541667
+## [2164] 0.7291667 0.8437500 0.6734694 0.9270833 0.8229167 0.9062500 0.6666667
+## [2171] 0.6354167 0.5937500 0.7916667 0.7395833 0.8645833 0.7916667 0.6875000
+## [2178] 0.8229167 0.8229167 0.8333333 0.6354167 0.6666667 0.8958333 0.7422680
+## [2185] 0.6250000 0.8125000 0.7604167 0.7604167 0.7083333 0.8854167 0.8020833
+## [2192] 0.7395833 0.8854167 0.7291667 0.8333333 0.6770833 0.7604167 0.7395833
+## [2199] 0.6979167 0.7604167 0.7916667 0.8020833 0.7812500 0.6770833 0.8541667
+## [2206] 0.7708333 0.7708333 0.6041667 0.7395833 0.7291667 0.8020833 0.8020833
+## [2213] 0.7291667 0.6458333 0.6458333 0.6562500 0.6770833 0.8229167 0.7812500
+## [2220] 0.6562500 0.6407767 0.8020833 0.6250000 0.8958333 0.6770833 0.6562500
+## [2227] 0.7916667 0.7500000 0.6666667 0.5208333 0.7395833 0.5729167 0.7083333
+## [2234] 0.8333333 0.5520833 0.7083333 0.5729167 0.7083333 0.6250000 0.7395833
+## [2241] 0.8125000 0.8333333 0.6562500 0.7187500 0.7812500 0.7604167 0.6250000
+## [2248] 0.6458333 0.8541667 0.6979167 0.8645833 0.7708333 0.5729167 0.6666667
+## [2255] 0.6770833 0.6979167 0.7604167 0.6354167 0.7395833 0.7395833 0.7812500
+## [2262] 0.8958333 0.8333333 0.7916667 0.7291667 0.6041667 0.7708333 0.6979167
+## [2269] 0.7916667 0.6979167 0.6250000 0.7604167 0.7604167 0.6250000 0.7604167
+## [2276] 0.7500000 0.6041667 0.5312500 0.5312500 0.6979167 0.8333333 0.6875000
+## [2283] 0.6979167 0.7500000 0.7187500 0.6041667 0.8541667 0.7916667 0.7187500
+## [2290] 0.7500000 0.6354167 0.7395833 0.6041667 0.8020833 0.7628866 0.7812500
+## [2297] 0.7500000 0.6666667 0.6458333 0.8229167 0.6562500 0.7500000 0.7812500
+## [2304] 0.5833333 0.7604167 0.7395833 0.7812500 0.7142857 0.6666667 0.6145833
+## [2311] 0.7083333 0.7812500 0.8333333 0.7812500 0.7083333 0.6666667 0.6770833
+## [2318] 0.6562500 0.7525773 0.7500000 0.6875000 0.7708333 0.8437500 0.7708333
+## [2325] 0.6875000 0.7708333 0.5208333 0.7812500 0.7319588 0.7395833 0.5729167
+## [2332] 0.7812500 0.7395833 0.7500000 0.8958333 0.8125000 0.7916667 0.6979167
+## [2339] 0.6041667 0.6875000 0.7916667 0.7604167 0.6354167 0.7500000 0.7187500
+## [2346] 0.7500000 0.7708333 0.7708333 0.7708333 0.6458333 0.7500000 0.6458333
+## [2353] 0.7500000 0.7291667 0.6250000 0.5416667 0.7291667 0.4895833 0.6250000
+## [2360] 0.7604167 0.7040816 0.5625000 0.5520833 0.7395833 0.7187500 0.5670103
+## [2367] 0.7187500 0.7291667 0.8437500 0.8020833 0.6875000 0.7604167 0.7604167
+## [2374] 0.7187500 0.5520833 0.5520833 0.8125000 0.6458333 0.5625000 0.5729167
+## [2381] 0.6907216 0.6875000 0.8854167 0.6907216 0.6041667 0.7708333 0.7604167
+## [2388] 0.7083333 0.7395833 0.7708333 0.6770833 0.5208333 0.6458333 0.7083333
+## [2395] 0.6562500 0.6979167 0.7604167 0.7812500 0.7812500 0.7812500 0.6145833
+## [2402] 0.5520833 0.6041667 0.7291667 0.7083333 0.6597938 0.7916667 0.6145833
+## [2409] 0.5208333 0.7187500 0.8541667 0.6250000 0.7708333 0.9278351 0.5000000
+## [2416] 0.5625000 0.7812500 0.8645833 0.8125000 0.6875000 0.7291667 0.7291667
+## [2423] 0.9270833 0.8333333 0.5520833 0.7291667 0.8541667 0.8020833 0.7604167
+## [2430] 0.7187500 0.8125000 0.7604167 0.7083333 0.6666667 0.5625000 0.7291667
+## [2437] 0.5729167 0.7812500 0.6354167 0.6979167 0.6979167 0.5520833 0.7812500
+## [2444] 0.6979167 0.7187500 0.6770833 0.7916667 0.8854167 0.7812500 0.6938776
+## [2451] 0.7812500 0.6979167 0.6458333 0.7083333 0.6354167 0.7187500 0.5937500
+## [2458] 0.6562500 0.7812500 0.6145833 0.6770833 0.6354167 0.6770833 0.7604167
+## [2465] 0.7708333 0.6562500 0.6354167 0.7187500 0.6562500 0.5876289 0.6875000
+## [2472] 0.7187500 0.7938144 0.7604167 0.8958333 0.8020833 0.7916667 0.7812500
+## [2479] 0.7291667 0.7604167 0.8020833 0.7604167 0.5520833 0.6875000 0.8020833
+## [2486] 0.7187500 0.6250000 0.6666667 0.8854167 0.6979167 0.4791667 0.6979167
+## [2493] 0.6354167 0.6458333 0.7812500 0.7500000 0.6875000 0.6666667 0.7083333
+## [2500] 0.5625000 0.6562500 0.7812500 0.8125000 0.5520833 0.6875000 0.5625000
+## [2507] 0.8750000 0.5416667 0.5104167 0.8125000 0.6458333 0.5520833 0.7187500
+## [2514] 0.7604167 0.6979167 0.7604167 0.6458333 0.7291667 0.8020833 0.8333333
+## [2521] 0.7916667 0.8229167 0.6354167 0.8125000 0.7395833 0.7708333 0.5625000
+## [2528] 0.6979167 0.7083333 0.5729167 0.5520833 0.7083333 0.8437500 0.8854167
+## [2535] 0.7083333 0.7604167 0.7812500 0.8333333 0.6666667 0.7916667 0.8229167
+## [2542] 0.5520833 0.7604167 0.7812500 0.6875000 0.8020833 0.5729167 0.5520833
+## [2549] 0.8958333 0.7083333 0.7083333 0.7395833 0.7291667 0.8229167 0.7291667
+## [2556] 0.6354167 0.7395833 0.6354167 0.8125000 0.7604167 0.5729167 0.7708333
+## [2563] 0.7835052 0.8958333 0.5937500 0.8333333 0.8229167 0.5833333 0.7113402
+## [2570] 0.7395833 0.5520833 0.6764706 0.7083333 0.6875000 0.8854167 0.5520833
+## [2577] 0.5833333 0.7604167 0.7187500 0.5937500 0.7291667 0.5520833 0.7916667
+## [2584] 0.7040816 0.6354167 0.7083333 0.5833333 0.8437500 0.6734694 0.6666667
+## [2591] 0.7708333 0.6458333 0.7916667 0.5520833 0.5833333 0.6770833 0.7812500
+## [2598] 0.5833333 0.7500000 0.7346939 0.6145833 0.6354167 0.6875000 0.8125000
+## [2605] 0.5520833 0.7604167 0.5625000 0.7083333 0.6666667 0.6979167 0.7500000
+## [2612] 0.6354167 0.7604167 0.7604167 0.6875000 0.8229167 0.8020833 0.5463918
+## [2619] 0.7395833 0.5625000 0.7812500 0.5416667 0.6666667 0.6458333 0.6770833
+## [2626] 0.7187500 0.5833333 0.6562500 0.7395833 0.8020833 0.6562500 0.7916667
+## [2633] 0.5625000 0.8645833 0.5520833 0.6666667 0.6979167 0.7604167 0.7395833
+## [2640] 0.5625000 0.7291667 0.6145833 0.7604167 0.6875000 0.5520833 0.8125000
+## [2647] 0.7500000 0.5416667 0.8229167 0.8041237 0.7708333 0.7187500 0.8958333
+## [2654] 0.8437500 0.6041667 0.7395833 0.6770833 0.5520833 0.7916667 0.8125000
+## [2661] 0.7604167 0.7812500 0.5520833 0.8437500 0.7708333 0.7812500 0.6666667
+## [2668] 0.6562500 0.6875000 0.7319588 0.8541667 0.7604167 0.7187500 0.5416667
+## [2675] 0.7500000 0.6354167 0.6354167 0.7500000 0.6875000 0.8645833 0.8020833
+## [2682] 0.7916667 0.6875000 0.7500000 0.5833333 0.6354167 0.8229167 0.6458333
+## [2689] 0.6250000 0.6562500 0.7812500 0.6979167 0.6354167 0.6562500 0.8333333
+## [2696] 0.7812500 0.7604167 0.6979167 0.7604167 0.7916667 0.7812500 0.6770833
+## [2703] 0.6979167 0.5833333 0.6041667 0.8333333 0.6875000 0.5104167 0.5979381
+## [2710] 0.7500000 0.8229167 0.5833333 0.7604167 0.7812500 0.5520833 0.7187500
+## [2717] 0.7500000 0.6875000 0.5833333 0.7916667 0.6145833 0.7083333 0.8041237
+## [2724] 0.7083333 0.7373737 0.6666667 0.8020833 0.7500000 0.7857143 0.6562500
+## [2731] 0.6597938 0.7916667 0.8333333 0.7708333 0.6979167 0.6979167 0.6041667
+## [2738] 0.7500000 0.6145833 0.6979167 0.8229167 0.7187500 0.5625000 0.7500000
+## [2745] 0.7395833 0.7500000 0.7395833 0.8000000 0.7708333 0.6458333 0.8333333
+## [2752] 0.6666667 0.7500000 0.7916667 0.7291667 0.8541667 0.6288660 0.8437500
+## [2759] 0.6875000
+## Levels: 1 2 3</code></pre>
 <pre class="r"><code>#check the extent inside the knn model.
 
 prk.prob &lt;- attr(prk, &quot;prob&quot;)
 head(prk)</code></pre>
-<pre><code>## [1] 0 0 0 0 0 0
-## Levels: 0 1 2</code></pre>
+<pre><code>## [1] 1 1 1 1 1 1
+## Levels: 1 2 3</code></pre>
 <pre class="r"><code>head(prk.prob)</code></pre>
-<pre><code>## [1] 0.7083333 0.8333333 0.7604167 0.8333333 0.6562500 0.6770833</code></pre>
+<pre><code>## [1] 0.6979167 0.7500000 0.8437500 0.7500000 0.8333333 0.8645833</code></pre>
 <pre class="r"><code>#understand the relationship of the classes of your test data relate to your model 
 CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)</code></pre>
 <pre><code>## 
@@ -1833,8 +1832,6 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)</code></pre>
 ##    Cell Contents
 ## |-------------------------|
 ## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
 ## |         N / Table Total |
 ## |-------------------------|
 ## 
@@ -1843,74 +1840,67 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)</code></pre>
 ## 
 ##  
 ##                         | prk 
-## ds_asses1_test_category |         0 |         2 | Row Total | 
-## ------------------------|-----------|-----------|-----------|
-##                       0 |      1990 |         0 |      1990 | 
-##                         |     1.000 |     0.000 |     0.721 | 
-##                         |     0.722 |     0.000 |           | 
-##                         |     0.721 |     0.000 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       1 |       266 |         0 |       266 | 
-##                         |     1.000 |     0.000 |     0.096 | 
-##                         |     0.096 |     0.000 |           | 
-##                         |     0.096 |     0.000 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       2 |       501 |         2 |       503 | 
-##                         |     0.996 |     0.004 |     0.182 | 
-##                         |     0.182 |     1.000 |           | 
-##                         |     0.182 |     0.001 |           | 
-## ------------------------|-----------|-----------|-----------|
-##            Column Total |      2757 |         2 |      2759 | 
-##                         |     0.999 |     0.001 |           | 
-## ------------------------|-----------|-----------|-----------|
+## ds_asses1_test_category |         1 | Row Total | 
+## ------------------------|-----------|-----------|
+##                       1 |      2016 |      2016 | 
+##                         |     0.731 |           | 
+## ------------------------|-----------|-----------|
+##                       2 |       237 |       237 | 
+##                         |     0.086 |           | 
+## ------------------------|-----------|-----------|
+##                       3 |       506 |       506 | 
+##                         |     0.183 |           | 
+## ------------------------|-----------|-----------|
+##            Column Total |      2759 |      2759 | 
+## ------------------------|-----------|-----------|
 ## 
 ## </code></pre>
 <pre class="r"><code> ##create confusion matrix
  tabc &lt;- table(prk,ds_asses1_test_category)
  tabc</code></pre>
 <pre><code>##    ds_asses1_test_category
-## prk    0    1    2
-##   0 1990  266  501
-##   1    0    0    0
-##   2    0    0    2</code></pre>
+## prk    1    2    3
+##   1 2016  237  506
+##   2    0    0    0
+##   3    0    0    0</code></pre>
 <pre class="r"><code>library(caret)
  confusionMatrix(tabc)</code></pre>
 <pre><code>## Confusion Matrix and Statistics
 ## 
 ##    ds_asses1_test_category
-## prk    0    1    2
-##   0 1990  266  501
-##   1    0    0    0
-##   2    0    0    2
+## prk    1    2    3
+##   1 2016  237  506
+##   2    0    0    0
+##   3    0    0    0
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.722           
-##                  95% CI : (0.7049, 0.7387)
-##     No Information Rate : 0.7213          
-##     P-Value [Acc &gt; NIR] : 0.4759          
+##                Accuracy : 0.7307          
+##                  95% CI : (0.7137, 0.7472)
+##     No Information Rate : 0.7307          
+##     P-Value [Acc &gt; NIR] : 0.5099          
 ##                                           
-##                   Kappa : 0.004           
+##                   Kappa : 0               
 ##                                           
 ##  Mcnemar&#39;s Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
-##                      Class: 0 Class: 1  Class: 2
-## Sensitivity          1.000000  0.00000 0.0039761
-## Specificity          0.002601  1.00000 1.0000000
-## Pos Pred Value       0.721799      NaN 1.0000000
-## Neg Pred Value       1.000000  0.90359 0.8182807
-## Prevalence           0.721276  0.09641 0.1823124
-## Detection Rate       0.721276  0.00000 0.0007249
-## Detection Prevalence 0.999275  0.00000 0.0007249
-## Balanced Accuracy    0.501300  0.50000 0.5019881</code></pre>
+##                      Class: 1 Class: 2 Class: 3
+## Sensitivity            1.0000   0.0000   0.0000
+## Specificity            0.0000   1.0000   1.0000
+## Pos Pred Value         0.7307      NaN      NaN
+## Neg Pred Value            NaN   0.9141   0.8166
+## Prevalence             0.7307   0.0859   0.1834
+## Detection Rate         0.7307   0.0000   0.0000
+## Detection Prevalence   1.0000   0.0000   0.0000
+## Balanced Accuracy      0.5000   0.5000   0.5000</code></pre>
 <pre class="r"><code> ##this function divides the correct predictions by total number of predictions 
  #that tell us how accurate the model is.
  
  accuracy &lt;- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
  accuracy(tabc)</code></pre>
-<pre><code>## [1] 72.20007</code></pre>
+<pre><code>## [1] 73.06995</code></pre>
 <pre class="r"><code> #check which ‘K’ value will result in the most accurate model
 
 i=1
@@ -1921,108 +1911,108 @@ k.optm[i] &lt;- 100 * sum(ds_asses1_test_category == knn.mod)/NROW(ds_asses1_tes
 k=i  
     cat(k,&#39;=&#39;,k.optm[i],&#39;\n&#39;)
 }</code></pre>
-<pre><code>## 1 = 66.07466 
-## 2 = 65.53099 
-## 3 = 69.04676 
-## 4 = 69.73541 
-## 5 = 70.67778 
-## 6 = 70.89525 
-## 7 = 71.9826 
-## 8 = 71.6564 
-## 9 = 71.9826 
-## 10 = 71.94636 
-## 11 = 71.80138 
-## 12 = 71.87387 
-## 13 = 71.87387 
-## 14 = 71.72889 
-## 15 = 71.76513 
-## 16 = 71.80138 
-## 17 = 71.69264 
-## 18 = 71.91011 
-## 19 = 72.05509 
-## 20 = 72.01885 
-## 21 = 71.94636 
-## 22 = 72.27256 
-## 23 = 72.16383 
-## 24 = 72.12758 
-## 25 = 72.27256 
-## 26 = 72.27256 
-## 27 = 72.23632 
-## 28 = 72.27256 
-## 29 = 72.09134 
-## 30 = 72.09134 
-## 31 = 72.16383 
-## 32 = 72.23632 
-## 33 = 72.34505 
-## 34 = 72.23632 
-## 35 = 72.3813 
-## 36 = 72.41754 
-## 37 = 72.3813 
-## 38 = 72.34505 
-## 39 = 72.34505 
-## 40 = 72.34505 
-## 41 = 72.30881 
-## 42 = 72.27256 
-## 43 = 72.27256 
-## 44 = 72.27256 
-## 45 = 72.23632 
-## 46 = 72.23632 
-## 47 = 72.23632 
-## 48 = 72.23632 
-## 49 = 72.20007 
-## 50 = 72.16383 
-## 51 = 72.20007 
-## 52 = 72.16383 
-## 53 = 72.16383 
-## 54 = 72.20007 
-## 55 = 72.20007 
-## 56 = 72.27256 
-## 57 = 72.27256 
-## 58 = 72.27256 
-## 59 = 72.27256 
-## 60 = 72.23632 
-## 61 = 72.23632 
-## 62 = 72.27256 
-## 63 = 72.27256 
-## 64 = 72.23632 
-## 65 = 72.23632 
-## 66 = 72.23632 
-## 67 = 72.23632 
-## 68 = 72.23632 
-## 69 = 72.23632 
-## 70 = 72.23632 
-## 71 = 72.23632 
-## 72 = 72.23632 
-## 73 = 72.23632 
-## 74 = 72.23632 
-## 75 = 72.23632 
-## 76 = 72.23632 
-## 77 = 72.23632 
-## 78 = 72.23632 
-## 79 = 72.23632 
-## 80 = 72.23632 
-## 81 = 72.20007 
-## 82 = 72.20007 
-## 83 = 72.20007 
-## 84 = 72.20007 
-## 85 = 72.20007 
-## 86 = 72.20007 
-## 87 = 72.20007 
-## 88 = 72.20007 
-## 89 = 72.20007 
-## 90 = 72.20007 
-## 91 = 72.20007 
-## 92 = 72.20007 
-## 93 = 72.20007 
-## 94 = 72.20007 
-## 95 = 72.20007 
-## 96 = 72.20007</code></pre>
+<pre><code>## 1 = 65.4585 
+## 2 = 65.20478 
+## 3 = 70.60529 
+## 4 = 71.22146 
+## 5 = 72.23632 
+## 6 = 72.85248 
+## 7 = 73.03371 
+## 8 = 73.35991 
+## 9 = 72.77999 
+## 10 = 73.21493 
+## 11 = 73.25118 
+## 12 = 73.86734 
+## 13 = 73.68612 
+## 14 = 73.54114 
+## 15 = 73.64987 
+## 16 = 73.32367 
+## 17 = 73.32367 
+## 18 = 73.61363 
+## 19 = 73.50489 
+## 20 = 73.35991 
+## 21 = 73.46865 
+## 22 = 73.50489 
+## 23 = 73.50489 
+## 24 = 73.54114 
+## 25 = 73.50489 
+## 26 = 73.54114 
+## 27 = 73.46865 
+## 28 = 73.61363 
+## 29 = 73.46865 
+## 30 = 73.46865 
+## 31 = 73.32367 
+## 32 = 73.35991 
+## 33 = 73.4324 
+## 34 = 73.39616 
+## 35 = 73.4324 
+## 36 = 73.35991 
+## 37 = 73.28742 
+## 38 = 73.21493 
+## 39 = 73.21493 
+## 40 = 73.17869 
+## 41 = 73.17869 
+## 42 = 73.21493 
+## 43 = 73.17869 
+## 44 = 73.21493 
+## 45 = 73.21493 
+## 46 = 73.25118 
+## 47 = 73.25118 
+## 48 = 73.17869 
+## 49 = 73.25118 
+## 50 = 73.17869 
+## 51 = 73.17869 
+## 52 = 73.21493 
+## 53 = 73.17869 
+## 54 = 73.14244 
+## 55 = 73.21493 
+## 56 = 73.17869 
+## 57 = 73.17869 
+## 58 = 73.21493 
+## 59 = 73.17869 
+## 60 = 73.14244 
+## 61 = 73.14244 
+## 62 = 73.14244 
+## 63 = 73.14244 
+## 64 = 73.14244 
+## 65 = 73.14244 
+## 66 = 73.17869 
+## 67 = 73.17869 
+## 68 = 73.17869 
+## 69 = 73.17869 
+## 70 = 73.17869 
+## 71 = 73.14244 
+## 72 = 73.1062 
+## 73 = 73.1062 
+## 74 = 73.1062 
+## 75 = 73.1062 
+## 76 = 73.1062 
+## 77 = 73.1062 
+## 78 = 73.1062 
+## 79 = 73.1062 
+## 80 = 73.1062 
+## 81 = 73.1062 
+## 82 = 73.1062 
+## 83 = 73.1062 
+## 84 = 73.1062 
+## 85 = 73.1062 
+## 86 = 73.1062 
+## 87 = 73.1062 
+## 88 = 73.1062 
+## 89 = 73.1062 
+## 90 = 73.1062 
+## 91 = 73.1062 
+## 92 = 73.1062 
+## 93 = 73.1062 
+## 94 = 73.1062 
+## 95 = 73.06995 
+## 96 = 73.06995</code></pre>
 <pre class="r"><code># Maximum accuracy at k=12, after that, it seems increasing K increases the classification 
 #but reduces success rate. It is worse to class LoanStatus360 as good when it is bad, 
 #than it is to class LoanStatus360 as bad when it is good.
 
 plot(k.optm, type = &#39;b&#39;, xlab=&quot;K- Value&quot;, ylab=&quot;Accuracy level&quot;)</code></pre>
-<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
 <pre class="r"><code>#Challenges faced in building the models
 
 

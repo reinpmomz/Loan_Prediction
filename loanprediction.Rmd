@@ -29,8 +29,10 @@ library(psych)
 
 ```{r loading dataset }
 #loading dataset
+
+library(tidyverse)
 setwd('E:/Documents/Reinp/GitHub Respositories/Loan_Prediction-with-RStudio')
-ds_asses<-read.table('Data Science assessment.csv', header=TRUE,sep=",")
+ds_asses<-read.csv('Data Science assessment.csv', header=TRUE,sep=",")
 #ds_asses[,-14]  #Reads only the required columns in csv
 View(ds_asses)
 attach(ds_asses)
@@ -92,27 +94,45 @@ tabLoanStatus360totalprice
 
 ```{r convert categorical variables to integer data types}
 #convert categorical variables to integer data types for regression purpose
-ds_asses [,1]=as.integer(ds_asses [,1])
-is.factor(ds_asses [,1])
-is.integer(ds_asses [,1])
-is.character(ds_asses [,1])
-ds_asses [,2]=as.integer(ds_asses [,2])-1
-is.factor(ds_asses [,2])
-is.integer(ds_asses [,2])
-is.character(ds_asses [,2])
-ds_asses [,3]=as.integer(ds_asses [,3])
-is.factor(ds_asses [,3])
-is.integer(ds_asses [,3])
-is.character(ds_asses [,3])
-ds_asses [,4]=as.integer(ds_asses [,4])
-is.factor(ds_asses [,4])
-is.integer(ds_asses [,4])
-is.character(ds_asses [,4])
-ds_asses [,13]=as.integer(ds_asses [,13])-1
-is.factor(ds_asses [,13])
-is.integer(ds_asses [,13])
-is.character(ds_asses [,13])
-View(ds_asses)
+ds_asses$Product=as.factor(ds_asses$Product)
+is.factor(ds_asses$Product)
+ds_asses$Product=as.numeric(ds_asses$Product)
+is.integer(ds_asses$Product)
+is.numeric(ds_asses$Product)
+is.character(ds_asses$Product)
+
+
+ds_asses$CustomerGender=as.factor(ds_asses$CustomerGender)
+is.factor(ds_asses$CustomerGender)
+ds_asses$CustomerGender=as.numeric(ds_asses$CustomerGender)
+is.integer(ds_asses$CustomerGender)
+is.numeric(ds_asses$CustomerGender)
+is.character(ds_asses$CustomerGender)
+
+
+ds_asses$Location=as.factor(ds_asses$Location)
+is.factor(ds_asses$Location)
+ds_asses$Location=as.numeric(ds_asses$Location)
+is.integer(ds_asses$Location)
+is.numeric(ds_asses$Location)
+is.character(ds_asses$Location)
+
+
+ds_asses$Region=as.factor(ds_asses$Region)
+is.factor(ds_asses$Region)
+ds_asses$Region=as.numeric(ds_asses$Region)
+is.integer(ds_asses$Region)
+is.numeric(ds_asses$Region)
+is.character(ds_asses$Region)
+
+
+ds_asses$LoanStatus360=as.factor(ds_asses$LoanStatus360)
+is.factor(ds_asses$LoanStatus360)
+ds_asses$LoanStatus360=as.numeric(ds_asses$LoanStatus360)
+is.integer(ds_asses$LoanStatus360)
+is.numeric(ds_asses$LoanStatus360)
+is.character(ds_asses$LoanStatus360)
+
 ```
 
 
@@ -161,7 +181,8 @@ dd <- as.dist((1-cor_ds_asses)/2)
 hc <- hclust(dd)
 cor_ds_asses <-cor_ds_asses[hc$order, hc$order]
 }
-cor_ds_asses <- reorder_cor_ds_asses(cor_ds_asses)
+cor_ds_asses2 <- reorder_cor_ds_asses(cor_ds_asses)
+
 # Melt the correlation matrix
 library(reshape2)
 
@@ -335,6 +356,7 @@ tail(ds_asses1)
 #the top 80 percent of the observations), which means the algorithm will never see 
 #the features of 2. This mistake will lead to poor prediction.
 
+
 shuffle_index <- sample(1:nrow(ds_asses1)) #Generate a random list of index from 
 #1 to 9195
 head(shuffle_index)
@@ -351,7 +373,7 @@ tail(ds_asses2)
 
 #Function to create two separate data frames. You don't want to touch the test set 
 #until you finish building your model
-
+set.seed(1729)
 create_train_test <- function(data, size = 0.8, train = TRUE) #Add the arguments in 
   #the function
   {

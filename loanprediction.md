@@ -1,7 +1,7 @@
 ---
 title: "loan prediction"
 author: "Reinp"
-date: "2020-05-05"
+date: "2020-05-30"
 output:
   html_document: 
     keep_md: yes
@@ -32,8 +32,10 @@ library(psych)
 
 ```r
 #loading dataset
+
+library(tidyverse)
 setwd('E:/Documents/Reinp/GitHub Respositories/Loan_Prediction-with-RStudio')
-ds_asses<-read.table('Data Science assessment.csv', header=TRUE,sep=",")
+ds_asses<-read.csv('Data Science assessment.csv', header=TRUE,sep=",")
 #ds_asses[,-14]  #Reads only the required columns in csv
 View(ds_asses)
 attach(ds_asses)
@@ -58,22 +60,20 @@ summary(ds_asses) #summarizes the dataset
 ```
 
 ```
-##       Product          CustomerGender        Location         Region    
-##  Product A:3141   Female      :3290   Location 25: 295   Region 6:2934  
-##  Product B:3862   Male        :5358   Location 3 : 244   Region 3:1941  
-##  Product C: 999   NotSpecified: 547   Location 6 : 201   Region 2:1364  
-##  Product D: 975                       Location 22: 179   Region 1:1232  
-##  Product E: 213                       Location 39: 177   Region 7: 622  
-##  Product F:   5                       Location 61: 173   Region 4: 588  
-##                                       (Other)    :7926   (Other) : 514  
-##    TotalPrice         StartDate       Deposit       DailyRate     
-##  Min.   :13775   5/24/2014 :  28   Min.   :1000   Min.   : 35.00  
-##  1st Qu.:16600   1/23/2016 :  22   1st Qu.:2000   1st Qu.: 40.00  
-##  Median :16600   09-11-15  :  20   Median :2000   Median : 40.00  
-##  Mean   :19266   12/13/2015:  20   Mean   :2312   Mean   : 46.45  
-##  3rd Qu.:20250   9/13/2015 :  20   3rd Qu.:2000   3rd Qu.: 50.00  
-##  Max.   :69225   4/23/2015 :  19   Max.   :9000   Max.   :165.00  
-##                  (Other)   :9066                                  
+##    Product          CustomerGender       Location            Region         
+##  Length:9195        Length:9195        Length:9195        Length:9195       
+##  Class :character   Class :character   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+##                                                                             
+##                                                                             
+##                                                                             
+##    TotalPrice     StartDate            Deposit       DailyRate     
+##  Min.   :13775   Length:9195        Min.   :1000   Min.   : 35.00  
+##  1st Qu.:16600   Class :character   1st Qu.:2000   1st Qu.: 40.00  
+##  Median :16600   Mode  :character   Median :2000   Median : 40.00  
+##  Mean   :19266                      Mean   :2312   Mean   : 46.45  
+##  3rd Qu.:20250                      3rd Qu.:2000   3rd Qu.: 50.00  
+##  Max.   :69225                      Max.   :9000   Max.   :165.00  
 ##    TotalDays    AmountPaid30    AmountPaid60   AmountPaid360  
 ##  Min.   :365   Min.   :-3200   Min.   :-3200   Min.   :-3200  
 ##  1st Qu.:365   1st Qu.: 2500   1st Qu.: 3438   1st Qu.:11351  
@@ -81,14 +81,12 @@ summary(ds_asses) #summarizes the dataset
 ##  Mean   :365   Mean   : 3580   Mean   : 4736   Mean   :14674  
 ##  3rd Qu.:365   3rd Qu.: 4601   3rd Qu.: 5668   3rd Qu.:16600  
 ##  Max.   :365   Max.   :26001   Max.   :33501   Max.   :69225  
-##                                                               
-##           LoanStatus360 
-##  Active          :6742  
-##  Blocked         : 849  
-##  Finished Payment:1604  
-##                         
-##                         
-##                         
+##  LoanStatus360     
+##  Length:9195       
+##  Class :character  
+##  Mode  :character  
+##                    
+##                    
 ## 
 ```
 
@@ -98,33 +96,33 @@ describe(ds_asses)
 
 ```
 ##                 vars    n     mean      sd median  trimmed     mad   min   max
-## Product*           1 9195     2.05    1.04      2     1.91    1.48     1     6
-## CustomerGender*    2 9195     1.70    0.57      2     1.68    0.00     1     3
-## Location*          3 9195   339.95  248.10    305   325.95  302.45     1   791
-## Region*            4 9195    11.58    4.68     12    12.37    4.45     1    18
+## Product*           1 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## CustomerGender*    2 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## Location*          3 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+## Region*            4 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
 ## TotalPrice         5 9195 19266.26 6053.29  16600 18397.93 1482.60 13775 69225
-## StartDate*         6 9195   762.22  434.80    769   762.95  542.63     1  1517
+## StartDate*         6 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
 ## Deposit            7 9195  2311.53 1412.61   2000  2116.56    0.00  1000  9000
 ## DailyRate          8 9195    46.45   13.38     40    44.61    0.00    35   165
 ## TotalDays          9 9195   365.00    0.00    365   365.00    0.00   365   365
 ## AmountPaid30      10 9195  3580.48 2487.32   3351  3465.23 1555.25 -3200 26001
 ## AmountPaid60      11 9195  4735.67 2756.33   4400  4548.92 1482.60 -3200 33501
 ## AmountPaid360     12 9195 14673.83 6676.24  15140 14459.55 4062.32 -3200 69225
-## LoanStatus360*    13 9195     1.44    0.77      1     1.30    0.00     1     3
-##                 range  skew kurtosis    se
-## Product*            5  0.98     0.30  0.01
-## CustomerGender*     2  0.12    -0.58  0.01
-## Location*         790  0.40    -1.09  2.59
-## Region*            17 -1.44     0.84  0.05
-## TotalPrice      55450  4.88    26.51 63.13
-## StartDate*       1516 -0.03    -1.19  4.53
-## Deposit          8000  2.63     9.39 14.73
-## DailyRate         130  5.02    27.94  0.14
-## TotalDays           0   NaN      NaN  0.00
-## AmountPaid30    29201  1.39     6.37 25.94
-## AmountPaid60    36701  1.83     8.08 28.74
-## AmountPaid360   72425  2.18    11.88 69.62
-## LoanStatus360*      2  1.34     0.01  0.01
+## LoanStatus360*    13 9195      NaN      NA     NA      NaN      NA   Inf  -Inf
+##                 range skew kurtosis    se
+## Product*         -Inf   NA       NA    NA
+## CustomerGender*  -Inf   NA       NA    NA
+## Location*        -Inf   NA       NA    NA
+## Region*          -Inf   NA       NA    NA
+## TotalPrice      55450 4.88    26.51 63.13
+## StartDate*       -Inf   NA       NA    NA
+## Deposit          8000 2.63     9.39 14.73
+## DailyRate         130 5.02    27.94  0.14
+## TotalDays           0  NaN      NaN  0.00
+## AmountPaid30    29201 1.39     6.37 25.94
+## AmountPaid60    36701 1.83     8.08 28.74
+## AmountPaid360   72425 2.18    11.88 69.62
+## LoanStatus360*   -Inf   NA       NA    NA
 ```
 
 
@@ -146,19 +144,19 @@ str(ds_asses)
 
 ```
 ## 'data.frame':	9195 obs. of  13 variables:
-##  $ Product       : Factor w/ 6 levels "Product A","Product B",..: 2 2 3 2 4 2 1 2 1 1 ...
-##  $ CustomerGender: Factor w/ 3 levels "Female","Male",..: 2 2 1 2 1 1 2 2 1 1 ...
-##  $ Location      : Factor w/ 791 levels "Location 1","Location 10",..: 109 220 442 553 660 2 13 24 220 35 ...
-##  $ Region        : Factor w/ 18 levels "Region 1","Region 10",..: 11 12 14 1 11 11 12 15 12 15 ...
+##  $ Product       : chr  "Product B" "Product B" "Product C" "Product B" ...
+##  $ CustomerGender: chr  "Male" "Male" "Female" "Male" ...
+##  $ Location      : chr  "Location 2" "Location 3" "Location 5" "Location 6" ...
+##  $ Region        : chr  "Region 2" "Region 3" "Region 5" "Region 1" ...
 ##  $ TotalPrice    : int  16600 16600 15600 16600 20250 16600 20250 16600 22250 20250 ...
-##  $ StartDate     : Factor w/ 1517 levels "01-01-13","01-01-15",..: 324 6 793 921 637 1065 326 1086 424 1347 ...
+##  $ StartDate     : chr  "07-04-14" "01-02-15" "12-08-12" "2/20/2015" ...
 ##  $ Deposit       : int  2000 2000 1000 2000 2000 2000 2000 2000 4000 2000 ...
 ##  $ DailyRate     : int  40 40 40 40 50 40 50 40 50 50 ...
 ##  $ TotalDays     : int  365 365 365 365 365 365 365 365 365 365 ...
 ##  $ AmountPaid30  : int  3121 3061 2160 3041 3470 3201 1851 3971 5750 1951 ...
 ##  $ AmountPaid60  : int  4241 4171 3280 4241 4820 4141 3251 4131 7450 3251 ...
 ##  $ AmountPaid360 : int  13621 15041 15340 15321 13720 14141 17701 15351 20250 17351 ...
-##  $ LoanStatus360 : Factor w/ 3 levels "Active","Blocked",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ LoanStatus360 : chr  "Active" "Active" "Active" "Active" ...
 ```
 
 ```r
@@ -391,16 +389,8 @@ tabLoanStatus360totalprice
 
 ```r
 #convert categorical variables to integer data types for regression purpose
-ds_asses [,1]=as.integer(ds_asses [,1])
-is.factor(ds_asses [,1])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-is.integer(ds_asses [,1])
+ds_asses$Product=as.factor(ds_asses$Product)
+is.factor(ds_asses$Product)
 ```
 
 ```
@@ -408,7 +398,8 @@ is.integer(ds_asses [,1])
 ```
 
 ```r
-is.character(ds_asses [,1])
+ds_asses$Product=as.numeric(ds_asses$Product)
+is.integer(ds_asses$Product)
 ```
 
 ```
@@ -416,41 +407,7 @@ is.character(ds_asses [,1])
 ```
 
 ```r
-ds_asses [,2]=as.integer(ds_asses [,2])-1
-is.factor(ds_asses [,2])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-is.integer(ds_asses [,2])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-is.character(ds_asses [,2])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-ds_asses [,3]=as.integer(ds_asses [,3])
-is.factor(ds_asses [,3])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-is.integer(ds_asses [,3])
+is.numeric(ds_asses$Product)
 ```
 
 ```
@@ -458,7 +415,7 @@ is.integer(ds_asses [,3])
 ```
 
 ```r
-is.character(ds_asses [,3])
+is.character(ds_asses$Product)
 ```
 
 ```
@@ -466,16 +423,8 @@ is.character(ds_asses [,3])
 ```
 
 ```r
-ds_asses [,4]=as.integer(ds_asses [,4])
-is.factor(ds_asses [,4])
-```
-
-```
-## [1] FALSE
-```
-
-```r
-is.integer(ds_asses [,4])
+ds_asses$CustomerGender=as.factor(ds_asses$CustomerGender)
+is.factor(ds_asses$CustomerGender)
 ```
 
 ```
@@ -483,7 +432,8 @@ is.integer(ds_asses [,4])
 ```
 
 ```r
-is.character(ds_asses [,4])
+ds_asses$CustomerGender=as.numeric(ds_asses$CustomerGender)
+is.integer(ds_asses$CustomerGender)
 ```
 
 ```
@@ -491,8 +441,15 @@ is.character(ds_asses [,4])
 ```
 
 ```r
-ds_asses [,13]=as.integer(ds_asses [,13])-1
-is.factor(ds_asses [,13])
+is.numeric(ds_asses$CustomerGender)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+is.character(ds_asses$CustomerGender)
 ```
 
 ```
@@ -500,7 +457,17 @@ is.factor(ds_asses [,13])
 ```
 
 ```r
-is.integer(ds_asses [,13])
+ds_asses$Location=as.factor(ds_asses$Location)
+is.factor(ds_asses$Location)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+ds_asses$Location=as.numeric(ds_asses$Location)
+is.integer(ds_asses$Location)
 ```
 
 ```
@@ -508,7 +475,15 @@ is.integer(ds_asses [,13])
 ```
 
 ```r
-is.character(ds_asses [,13])
+is.numeric(ds_asses$Location)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+is.character(ds_asses$Location)
 ```
 
 ```
@@ -516,7 +491,71 @@ is.character(ds_asses [,13])
 ```
 
 ```r
-View(ds_asses)
+ds_asses$Region=as.factor(ds_asses$Region)
+is.factor(ds_asses$Region)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+ds_asses$Region=as.numeric(ds_asses$Region)
+is.integer(ds_asses$Region)
+```
+
+```
+## [1] FALSE
+```
+
+```r
+is.numeric(ds_asses$Region)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+is.character(ds_asses$Region)
+```
+
+```
+## [1] FALSE
+```
+
+```r
+ds_asses$LoanStatus360=as.factor(ds_asses$LoanStatus360)
+is.factor(ds_asses$LoanStatus360)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+ds_asses$LoanStatus360=as.numeric(ds_asses$LoanStatus360)
+is.integer(ds_asses$LoanStatus360)
+```
+
+```
+## [1] FALSE
+```
+
+```r
+is.numeric(ds_asses$LoanStatus360)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+is.character(ds_asses$LoanStatus360)
+```
+
+```
+## [1] FALSE
 ```
 
 
@@ -700,7 +739,8 @@ dd <- as.dist((1-cor_ds_asses)/2)
 hc <- hclust(dd)
 cor_ds_asses <-cor_ds_asses[hc$order, hc$order]
 }
-cor_ds_asses <- reorder_cor_ds_asses(cor_ds_asses)
+cor_ds_asses2 <- reorder_cor_ds_asses(cor_ds_asses)
+
 # Melt the correlation matrix
 library(reshape2)
 
@@ -761,7 +801,7 @@ summary(mlm1a)
 ## 
 ## Coefficients: (1 not defined because of singularities)
 ##                  Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    -694.34338  209.96174  -3.307 0.000947 ***
+## (Intercept)    -869.22408  236.30752  -3.678 0.000236 ***
 ## Product         -98.95731   53.05113  -1.865 0.062168 .  
 ## CustomerGender  174.88070   74.04345   2.362 0.018204 *  
 ## Location          0.13513    0.16641   0.812 0.416790    
@@ -801,7 +841,7 @@ summary(mlm2a)
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    -694.34338  209.96174  -3.307 0.000947 ***
+## (Intercept)    -869.22408  236.30752  -3.678 0.000236 ***
 ## Product         -98.95731   53.05113  -1.865 0.062168 .  
 ## CustomerGender  174.88070   74.04345   2.362 0.018204 *  
 ## Location          0.13513    0.16641   0.812 0.416790    
@@ -828,8 +868,8 @@ p
 ```
 
 ```
-##        fit   lwr      upr
-## 1 12950.48 12822 13078.97
+##       fit      lwr     upr
+## 1 12775.6 12615.51 12935.7
 ```
 
 
@@ -853,10 +893,10 @@ summary(mlm3a)
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    -651.26315  203.14502  -3.206  0.00135 ** 
-## Product        -101.57837   52.95186  -1.918  0.05510 .  
-## CustomerGender  174.65458   74.04156   2.359  0.01835 *  
-## Region           27.59426    8.83313   3.124  0.00179 ** 
+## (Intercept)    -825.91773  230.20676  -3.588 0.000335 ***
+## Product        -101.57837   52.95186  -1.918 0.055102 .  
+## CustomerGender  174.65458   74.04156   2.359 0.018351 *  
+## Region           27.59426    8.83313   3.124 0.001790 ** 
 ## TotalPrice        0.51190    0.01701  30.096  < 2e-16 ***
 ## Deposit          -1.17973    0.09673 -12.196  < 2e-16 ***
 ## AmountPaid30     -1.10534    0.06665 -16.584  < 2e-16 ***
@@ -879,7 +919,7 @@ p1
 
 ```
 ##        fit      lwr      upr
-## 1 12981.11 12876.02 13086.19
+## 1 12806.45 12664.74 12948.17
 ```
 
 ```r
@@ -903,7 +943,7 @@ summary(mlm4a)
 ## 
 ## Coefficients:
 ##                  Estimate Std. Error t value Pr(>|t|)    
-## (Intercept)    -643.70881  203.13647  -3.169 0.001535 ** 
+## (Intercept)    -794.04659  229.63994  -3.458 0.000547 ***
 ## CustomerGender  150.33778   72.95903   2.061 0.039371 *  
 ## Region           29.20511    8.79441   3.321 0.000901 ***
 ## TotalPrice        0.49460    0.01442  34.292  < 2e-16 ***
@@ -927,8 +967,8 @@ p2
 ```
 
 ```
-##       fit      lwr      upr
-## 1 12996.8 12892.93 13100.67
+##        fit      lwr      upr
+## 1 12846.47 12710.76 12982.17
 ```
 
 ```r
@@ -954,7 +994,7 @@ coefficients(mlm4a) # model coefficients
 
 ```
 ##    (Intercept) CustomerGender         Region     TotalPrice        Deposit 
-##   -643.7088144    150.3377772     29.2051094      0.4946036     -1.0720393 
+##   -794.0465916    150.3377772     29.2051094      0.4946036     -1.0720393 
 ##   AmountPaid30   AmountPaid60 
 ##     -1.1353656      2.5102698
 ```
@@ -965,7 +1005,7 @@ confint(mlm4a, level=0.95) # CIs for model parameters
 
 ```
 ##                        2.5 %       97.5 %
-## (Intercept)    -1041.9014283 -245.5162006
+## (Intercept)    -1244.1918987 -343.9012846
 ## CustomerGender     7.3218671  293.3536872
 ## Region            11.9661084   46.4441103
 ## TotalPrice         0.4663306    0.5228766
@@ -1000,15 +1040,15 @@ vcov(mlm4a) # covariance matrix for model parameters
 
 ```
 ##                  (Intercept) CustomerGender        Region    TotalPrice
-## (Intercept)     4.126442e+04  -3.073529e+03 -9.077594e+02 -2.0624482419
-## CustomerGender -3.073529e+03   5.323020e+03 -3.338803e+00 -0.0993581245
-## Region         -9.077594e+02  -3.338803e+00  7.734168e+01  0.0050764365
-## TotalPrice     -2.062448e+00  -9.935812e-02  5.076437e-03  0.0002080335
-## Deposit         7.082079e+00   1.030079e+00 -2.701815e-02 -0.0008656772
-## AmountPaid30   -9.628892e-01  -2.487421e-01  1.979133e-02  0.0003067156
-## AmountPaid60   -2.050758e-02  -4.203525e-02 -1.941552e-02 -0.0002178811
+## (Intercept)     5.273450e+04  -8.396549e+03 -9.044206e+02 -1.9630901174
+## CustomerGender -8.396549e+03   5.323020e+03 -3.338803e+00 -0.0993581245
+## Region         -9.044206e+02  -3.338803e+00  7.734168e+01  0.0050764365
+## TotalPrice     -1.963090e+00  -9.935812e-02  5.076437e-03  0.0002080335
+## Deposit         6.052000e+00   1.030079e+00 -2.701815e-02 -0.0008656772
+## AmountPaid30   -7.141471e-01  -2.487421e-01  1.979133e-02  0.0003067156
+## AmountPaid60    2.152767e-02  -4.203525e-02 -1.941552e-02 -0.0002178811
 ##                      Deposit  AmountPaid30  AmountPaid60
-## (Intercept)     7.0820792766 -0.9628892221 -0.0205075822
+## (Intercept)     6.0520004193 -0.7141471317  0.0215276680
 ## CustomerGender  1.0300788573 -0.2487420904 -0.0420352501
 ## Region         -0.0270181465  0.0197913250 -0.0194155166
 ## TotalPrice     -0.0008656772  0.0003067156 -0.0002178811
@@ -1100,19 +1140,19 @@ head(ds_asses1)
 
 ```
 ##   Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 1       2              1      109     11      16600    2000        40
-## 2       2              1      220     12      16600    2000        40
-## 3       3              0      442     14      15600    1000        40
-## 4       2              1      553      1      16600    2000        40
-## 5       4              0      660     11      20250    2000        50
-## 6       2              0        2     11      16600    2000        40
+## 1       2              2      109     11      16600    2000        40
+## 2       2              2      220     12      16600    2000        40
+## 3       3              1      442     14      15600    1000        40
+## 4       2              2      553      1      16600    2000        40
+## 5       4              1      660     11      20250    2000        50
+## 6       2              1        2     11      16600    2000        40
 ##   AmountPaid30 AmountPaid60 LoanStatus360
-## 1         3121         4241             0
-## 2         3061         4171             0
-## 3         2160         3280             0
-## 4         3041         4241             0
-## 5         3470         4820             0
-## 6         3201         4141             0
+## 1         3121         4241             1
+## 2         3061         4171             1
+## 3         2160         3280             1
+## 4         3041         4241             1
+## 5         3470         4820             1
+## 6         3201         4141             1
 ```
 
 ```r
@@ -1121,19 +1161,19 @@ tail(ds_asses1)
 
 ```
 ##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 9190       3              1      447     15      15600    1000        40
-## 9191       1              0      221     11      20250    2000        50
-## 9192       4              0      520     15      20250    2000        50
-## 9193       2              0      763     11      16600    2000        40
-## 9194       2              1      331     13      16600    2000        40
-## 9195       4              1       67      1      20250    2000        50
+## 9190       3              2      447     15      15600    1000        40
+## 9191       1              1      221     11      20250    2000        50
+## 9192       4              1      520     15      20250    2000        50
+## 9193       2              1      763     11      16600    2000        40
+## 9194       2              2      331     13      16600    2000        40
+## 9195       4              2       67      1      20250    2000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 9190         2040         3400             2
-## 9191         3601         4301             2
-## 9192         4001         5501             2
-## 9193         3401         4601             2
-## 9194         3400         4600             2
-## 9195         6950         6950             2
+## 9190         2040         3400             3
+## 9191         3601         4301             3
+## 9192         4001         5501             3
+## 9193         3401         4601             3
+## 9194         3400         4600             3
+## 9195         6950         6950             3
 ```
 
 ```r
@@ -1144,13 +1184,14 @@ tail(ds_asses1)
 #the top 80 percent of the observations), which means the algorithm will never see 
 #the features of 2. This mistake will lead to poor prediction.
 
+
 shuffle_index <- sample(1:nrow(ds_asses1)) #Generate a random list of index from 
 #1 to 9195
 head(shuffle_index)
 ```
 
 ```
-## [1] 2560 3388 4136 6020  802 2298
+## [1] 7462 7970 6570  505  890 4030
 ```
 
 ```r
@@ -1158,7 +1199,7 @@ tail(shuffle_index)
 ```
 
 ```
-## [1] 3771 9036 2013 9168 5021 4064
+## [1] 2973 5301 6104 9144 4060 5808
 ```
 
 ```r
@@ -1168,19 +1209,19 @@ head(ds_asses2)
 
 ```
 ##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 2560       2              0      376      1      16600    2000        40
-## 3388       2              0      443      1      16600    2000        40
-## 4136       2              1        2     11      16600    2000        40
-## 6020       1              1       87     16      22250    4000        50
-## 802        2              0      211     12      16600    2000        40
-## 2298       2              1      763     11      16600    2000        40
+## 7462       3              3      548     11      15600    1000        40
+## 7970       2              2      243     15      16600    2000        40
+## 6570       4              2      423     15      20250    2000        50
+## 505        2              2      354     13      16600    2000        40
+## 890        1              2      784     15      20750    2500        50
+## 4030       1              1      165     12      19250    1000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 2560         3448         4448             0
-## 3388         3081         4181             0
-## 4136         3080         4440             0
-## 6020         5390         7030             0
-## 802          3040         4400             0
-## 2298         2991         4104             0
+## 7462         2040         2640             2
+## 7970         3141         4201             3
+## 6570         3301         4891             1
+## 505          3041         4001             1
+## 890          3400         3600             1
+## 4030          500         2150             1
 ```
 
 ```r
@@ -1189,19 +1230,19 @@ tail(ds_asses2)
 
 ```
 ##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 3771       2              1      331     13      16600    2000        40
-## 9036       3              2      102     15      15600    1000        40
-## 2013       4              1      390     18      20250    2000        50
-## 9168       1              0      661     16      19250    1000        50
-## 5021       5              1      476     15      54625    9000       125
-## 4064       1              0      779     15      22250    4000        50
+## 2973       2              1      553      1      16600    2000        40
+## 5301       2              1       41      1      16600    2000        40
+## 6104       3              2       96     15      15600    1000        40
+## 9144       3              2       86     15      15600    1000        40
+## 4060       3              2      373     17      15600    1000        40
+## 5808       2              2      376      1      16600    2000        40
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 3771         3251         4501             0
-## 9036         2500         3400             2
-## 2013         3351         4851             0
-## 9168         2000         8900             2
-## 5021        12376        16126             0
-## 4064         5230         6970             0
+## 2973         3251         3891             1
+## 5301         3261         4251             1
+## 6104         1600         2000             1
+## 9144         2300         3400             3
+## 4060         2200         3280             1
+## 5808         3391         4351             1
 ```
 
 ```r
@@ -1213,7 +1254,7 @@ tail(ds_asses2)
 
 #Function to create two separate data frames. You don't want to touch the test set 
 #until you finish building your model
-
+set.seed(1729)
 create_train_test <- function(data, size = 0.8, train = TRUE) #Add the arguments in 
   #the function
   {
@@ -1252,8 +1293,8 @@ prop.table(table(data_train$CustomerGender))
 
 ```
 ## 
-##          0          1          2 
-## 0.35997825 0.58156607 0.05845568
+##          1          2          3 
+## 0.35440457 0.58401305 0.06158238
 ```
 
 ```r
@@ -1262,8 +1303,8 @@ prop.table(table(data_test$CustomerGender))
 
 ```
 ## 
-##          0          1          2 
-## 0.34910277 0.58727569 0.06362153
+##          1          2          3 
+## 0.37139750 0.57748777 0.05111474
 ```
 
 ```r
@@ -1280,13 +1321,7 @@ fit
 ## node), split, n, loss, yval, (yprob)
 ##       * denotes terminal node
 ## 
-##  1) root 7356 1960 0 (0.73355084 0.09325721 0.17319195)  
-##    2) AmountPaid60< 4563 4108  880 0 (0.78578384 0.12682571 0.08739046) *
-##    3) AmountPaid60>=4563 3248 1080 0 (0.66748768 0.05080049 0.28171182)  
-##      6) TotalPrice>=21500 1473  339 0 (0.76985743 0.06042091 0.16972166) *
-##      7) TotalPrice< 21500 1775  741 0 (0.58253521 0.04281690 0.37464789)  
-##       14) AmountPaid60< 5230.5 1105  358 0 (0.67601810 0.04796380 0.27601810) *
-##       15) AmountPaid60>=5230.5 670  310 2 (0.42835821 0.03432836 0.53731343) *
+## 1) root 7356 1977 1 (0.73123980 0.09284937 0.17591082) *
 ```
 
 ```r
@@ -1299,10 +1334,10 @@ table_mat
 
 ```
 ##    predict_unseen
-##        0    1    2
-##   0 1278    0   68
-##   1  156    0    7
-##   2  249    0   81
+##        1    2    3
+##   1 1363    0    0
+##   2  166    0    0
+##   3  310    0    0
 ```
 
 ```r
@@ -1317,8 +1352,6 @@ CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)
 ##    Cell Contents
 ## |-------------------------|
 ## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
 ## |         N / Table Total |
 ## |-------------------------|
 ## 
@@ -1327,26 +1360,19 @@ CrossTable(x = data_test$LoanStatus360, y = predict_unseen, prop.chisq=FALSE)
 ## 
 ##  
 ##                         | predict_unseen 
-## data_test$LoanStatus360 |         0 |         2 | Row Total | 
-## ------------------------|-----------|-----------|-----------|
-##                       0 |      1278 |        68 |      1346 | 
-##                         |     0.949 |     0.051 |     0.732 | 
-##                         |     0.759 |     0.436 |           | 
-##                         |     0.695 |     0.037 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       1 |       156 |         7 |       163 | 
-##                         |     0.957 |     0.043 |     0.089 | 
-##                         |     0.093 |     0.045 |           | 
-##                         |     0.085 |     0.004 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       2 |       249 |        81 |       330 | 
-##                         |     0.755 |     0.245 |     0.179 | 
-##                         |     0.148 |     0.519 |           | 
-##                         |     0.135 |     0.044 |           | 
-## ------------------------|-----------|-----------|-----------|
-##            Column Total |      1683 |       156 |      1839 | 
-##                         |     0.915 |     0.085 |           | 
-## ------------------------|-----------|-----------|-----------|
+## data_test$LoanStatus360 |         1 | Row Total | 
+## ------------------------|-----------|-----------|
+##                       1 |      1363 |      1363 | 
+##                         |     0.741 |           | 
+## ------------------------|-----------|-----------|
+##                       2 |       166 |       166 | 
+##                         |     0.090 |           | 
+## ------------------------|-----------|-----------|
+##                       3 |       310 |       310 | 
+##                         |     0.169 |           | 
+## ------------------------|-----------|-----------|
+##            Column Total |      1839 |      1839 | 
+## ------------------------|-----------|-----------|
 ## 
 ## 
 ```
@@ -1361,7 +1387,7 @@ print(paste('Accuracy for test', accuracy_Test))
 ```
 
 ```
-## [1] "Accuracy for test 0.738988580750408"
+## [1] "Accuracy for test 0.741163675910821"
 ```
 
 
@@ -1374,19 +1400,19 @@ head(ds_asses1)
 
 ```
 ##   Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 1       2              1      109     11      16600    2000        40
-## 2       2              1      220     12      16600    2000        40
-## 3       3              0      442     14      15600    1000        40
-## 4       2              1      553      1      16600    2000        40
-## 5       4              0      660     11      20250    2000        50
-## 6       2              0        2     11      16600    2000        40
+## 1       2              2      109     11      16600    2000        40
+## 2       2              2      220     12      16600    2000        40
+## 3       3              1      442     14      15600    1000        40
+## 4       2              2      553      1      16600    2000        40
+## 5       4              1      660     11      20250    2000        50
+## 6       2              1        2     11      16600    2000        40
 ##   AmountPaid30 AmountPaid60 LoanStatus360
-## 1         3121         4241             0
-## 2         3061         4171             0
-## 3         2160         3280             0
-## 4         3041         4241             0
-## 5         3470         4820             0
-## 6         3201         4141             0
+## 1         3121         4241             1
+## 2         3061         4171             1
+## 3         2160         3280             1
+## 4         3041         4241             1
+## 5         3470         4820             1
+## 6         3201         4141             1
 ```
 
 ```r
@@ -1395,19 +1421,19 @@ tail(ds_asses1)
 
 ```
 ##      Product CustomerGender Location Region TotalPrice Deposit DailyRate
-## 9190       3              1      447     15      15600    1000        40
-## 9191       1              0      221     11      20250    2000        50
-## 9192       4              0      520     15      20250    2000        50
-## 9193       2              0      763     11      16600    2000        40
-## 9194       2              1      331     13      16600    2000        40
-## 9195       4              1       67      1      20250    2000        50
+## 9190       3              2      447     15      15600    1000        40
+## 9191       1              1      221     11      20250    2000        50
+## 9192       4              1      520     15      20250    2000        50
+## 9193       2              1      763     11      16600    2000        40
+## 9194       2              2      331     13      16600    2000        40
+## 9195       4              2       67      1      20250    2000        50
 ##      AmountPaid30 AmountPaid60 LoanStatus360
-## 9190         2040         3400             2
-## 9191         3601         4301             2
-## 9192         4001         5501             2
-## 9193         3401         4601             2
-## 9194         3400         4600             2
-## 9195         6950         6950             2
+## 9190         2040         3400             3
+## 9191         3601         4301             3
+## 9192         4001         5501             3
+## 9193         3401         4601             3
+## 9194         3400         4600             3
+## 9195         6950         6950             3
 ```
 
 ```r
@@ -1417,7 +1443,7 @@ table(ds_asses1$LoanStatus360)
 
 ```
 ## 
-##    0    1    2 
+##    1    2    3 
 ## 6742  849 1604
 ```
 
@@ -1428,7 +1454,7 @@ round(prop.table(table(ds_asses1$LoanStatus360)) * 100, digits = 2)
 
 ```
 ## 
-##     0     1     2 
+##     1     2     3 
 ## 73.32  9.23 17.44
 ```
 
@@ -1499,7 +1525,7 @@ prop.table(table(ds_asses1_train$Product))
 ```
 ## 
 ##          0        0.2        0.4        0.6        0.8          1 
-## 0.33903045 0.41811684 0.11155998 0.10829708 0.02221877 0.00077688
+## 0.34431324 0.41858297 0.11062772 0.10348042 0.02221877 0.00077688
 ```
 
 ```r
@@ -1509,7 +1535,7 @@ prop.table(table(ds_asses1_test$Product))
 ```
 ## 
 ##          0        0.2        0.4        0.6        0.8 
-## 0.34758971 0.42442914 0.10184850 0.10076115 0.02537151
+## 0.33526640 0.42334179 0.10402320 0.11199710 0.02537151
 ```
 
 ```r
@@ -1519,7 +1545,7 @@ prop.table(table(ds_asses1_train$CustomerGender))
 ```
 ## 
 ##          0        0.5          1 
-## 0.35565569 0.58172778 0.06261653
+## 0.35783095 0.58141703 0.06075202
 ```
 
 ```r
@@ -1529,7 +1555,7 @@ prop.table(table(ds_asses1_test$CustomerGender))
 ```
 ## 
 ##          0        0.5          1 
-## 0.36281261 0.58499456 0.05219282
+## 0.35773831 0.58571946 0.05654223
 ```
 
 ```r
@@ -1560,478 +1586,478 @@ sqrt(nrow(ds_asses1))
 ```
 
 ```
-##    [1] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##   [38] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##   [75] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [112] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [149] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [186] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [223] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [260] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [297] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [334] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [371] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [408] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [445] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [482] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [519] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [556] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [593] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [630] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [667] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [704] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [741] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [778] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [815] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [852] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [889] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [926] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-##  [963] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1000] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1037] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1074] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1111] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1148] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1185] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1222] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1259] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1296] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1333] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1370] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1407] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1444] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1481] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1518] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1555] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1592] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1629] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1666] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1703] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1740] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1777] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1814] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1851] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1888] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1925] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1962] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [1999] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2036] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2073] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2110] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2147] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2184] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2221] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2258] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2295] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2332] 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2369] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2406] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2443] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2480] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2517] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2554] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2591] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2628] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2665] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2702] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
-## [2739] 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+##    [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##   [38] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##   [75] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [112] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [149] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [186] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [223] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [260] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [297] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [334] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [371] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [408] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [445] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [482] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [519] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [556] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [593] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [630] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [667] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [704] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [741] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [778] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [815] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [852] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [889] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [926] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+##  [963] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1000] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1037] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1074] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1111] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1148] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1185] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1222] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1259] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1296] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1333] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1370] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1407] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1444] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1481] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1518] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1555] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1592] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1629] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1666] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1703] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1740] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1777] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1814] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1851] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1888] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1925] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1962] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [1999] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2036] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2073] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2110] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2147] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2184] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2221] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2258] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2295] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2332] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2369] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2406] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2443] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2480] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2517] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2554] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2591] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2628] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2665] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2702] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [2739] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 ## attr(,"prob")
-##    [1] 0.7083333 0.8333333 0.7604167 0.8333333 0.6562500 0.6770833 0.8333333
-##    [8] 0.7422680 0.9270833 0.8437500 0.7083333 0.8437500 0.7708333 0.8437500
-##   [15] 0.7187500 0.7187500 0.7525773 0.6458333 0.8750000 0.8144330 0.7083333
-##   [22] 0.8541667 0.6875000 0.7395833 0.9062500 0.8247423 0.8333333 0.7395833
-##   [29] 0.8125000 0.7083333 0.7083333 0.8541667 0.8645833 0.7083333 0.7187500
-##   [36] 0.8854167 0.5312500 0.8350515 0.7916667 0.7708333 0.5729167 0.6458333
-##   [43] 0.8125000 0.8333333 0.7187500 0.8645833 0.7500000 0.6979167 0.8333333
-##   [50] 0.7916667 0.8437500 0.7916667 0.7291667 0.6979167 0.8854167 0.9166667
-##   [57] 0.7916667 0.8541667 0.9166667 0.7395833 0.8645833 0.8333333 0.8229167
-##   [64] 0.8437500 0.8541667 0.7500000 0.7500000 0.7604167 0.7708333 0.8645833
-##   [71] 0.6262626 0.6979167 0.8645833 0.8541667 0.8762887 0.8645833 0.9166667
-##   [78] 0.7187500 0.9166667 0.5520833 0.6562500 0.7812500 0.7812500 0.8437500
-##   [85] 0.8125000 0.8125000 0.8645833 0.7604167 0.8125000 0.7187500 0.7916667
-##   [92] 0.6979167 0.6770833 0.6907216 0.6979167 0.8041237 0.7812500 0.8020833
-##   [99] 0.7083333 0.9062500 0.8750000 0.7500000 0.7708333 0.8437500 0.6354167
-##  [106] 0.7083333 0.6666667 0.7187500 0.6565657 0.7291667 0.6666667 0.8020833
-##  [113] 0.7812500 0.7187500 0.6875000 0.5625000 0.7500000 0.6770833 0.7708333
-##  [120] 0.7083333 0.8229167 0.8453608 0.6979167 0.9062500 0.6562500 0.7319588
-##  [127] 0.6979167 0.8437500 0.8125000 0.8854167 0.8541667 0.6979167 0.6666667
-##  [134] 0.7083333 0.7604167 0.8854167 0.8437500 0.8229167 0.8125000 0.7916667
-##  [141] 0.7083333 0.7083333 0.9479167 0.8229167 0.6875000 0.8645833 0.7916667
-##  [148] 0.8333333 0.8229167 0.8645833 0.7708333 0.8854167 0.7291667 0.8437500
-##  [155] 0.7500000 0.7812500 0.7708333 0.7604167 0.8437500 0.9166667 0.7708333
-##  [162] 0.7187500 0.7604167 0.7500000 0.8020833 0.6666667 0.7916667 0.6354167
-##  [169] 0.7812500 0.7731959 0.8020833 0.8750000 0.7083333 0.8645833 0.7916667
-##  [176] 0.8541667 0.6979167 0.8541667 0.7083333 0.7812500 0.6458333 0.8645833
-##  [183] 0.7812500 0.6979167 0.8645833 0.7708333 0.6979167 0.7812500 0.5625000
-##  [190] 0.8958333 0.7708333 0.6666667 0.9072165 0.7604167 0.8020833 0.7319588
-##  [197] 0.7812500 0.7708333 0.8125000 0.7395833 0.6875000 0.7812500 0.8020833
-##  [204] 0.7604167 0.8437500 0.5520833 0.7083333 0.7916667 0.7500000 0.8556701
-##  [211] 0.8865979 0.7083333 0.6979167 0.7604167 0.8437500 0.8229167 0.8437500
-##  [218] 0.8541667 0.7200000 0.6391753 0.8229167 0.5312500 0.7291667 0.6562500
-##  [225] 0.7291667 0.7604167 0.6562500 0.6770833 0.8437500 0.7291667 0.6770833
-##  [232] 0.8333333 0.7083333 0.7395833 0.8020833 0.7708333 0.8437500 0.7812500
-##  [239] 0.8958333 0.7187500 0.8229167 0.7083333 0.6494845 0.7812500 0.7708333
-##  [246] 0.7422680 0.7291667 0.7395833 0.6979167 0.7187500 0.8333333 0.7500000
-##  [253] 0.7083333 0.7812500 0.7319588 0.9166667 0.6770833 0.6979167 0.8541667
-##  [260] 0.7083333 0.8854167 0.7604167 0.6770833 0.6666667 0.9270833 0.7500000
-##  [267] 0.7604167 0.7272727 0.7142857 0.7812500 0.8541667 0.5312500 0.7916667
-##  [274] 0.7628866 0.7500000 0.5463918 0.5520833 0.7083333 0.7812500 0.8969072
-##  [281] 0.6979167 0.7291667 0.7708333 0.8750000 0.7500000 0.7422680 0.8020833
-##  [288] 0.8020833 0.7291667 0.8125000 0.7291667 0.7708333 0.8958333 0.6979167
-##  [295] 0.7083333 0.7187500 0.8750000 0.7708333 0.8229167 0.7916667 0.6979167
-##  [302] 0.7083333 0.8350515 0.7604167 0.7812500 0.6562500 0.7187500 0.8020833
-##  [309] 0.9062500 0.8229167 0.8333333 0.6145833 0.8125000 0.8020833 0.9166667
-##  [316] 0.8229167 0.8750000 0.7083333 0.7010309 0.8958333 0.7083333 0.8144330
-##  [323] 0.7291667 0.8437500 0.7916667 0.6979167 0.8020833 0.7708333 0.6666667
-##  [330] 0.8854167 0.7812500 0.7812500 0.7916667 0.8229167 0.7604167 0.8854167
-##  [337] 0.7812500 0.7708333 0.5937500 0.8750000 0.8333333 0.6979167 0.8333333
-##  [344] 0.7708333 0.8645833 0.6666667 0.7291667 0.7500000 0.8333333 0.7812500
-##  [351] 0.6770833 0.8750000 0.7187500 0.6875000 0.8125000 0.6458333 0.7604167
-##  [358] 0.8020833 0.5000000 0.6458333 0.5000000 0.5876289 0.7010309 0.7187500
-##  [365] 0.7604167 0.7395833 0.7319588 0.7812500 0.7708333 0.7187500 0.8958333
-##  [372] 0.7187500 0.6530612 0.9175258 0.7291667 0.9062500 0.7604167 0.6041667
-##  [379] 0.7346939 0.7500000 0.8229167 0.7916667 0.5520833 0.6666667 0.7291667
-##  [386] 0.6979167 0.6770833 0.5625000 0.8750000 0.6875000 0.7291667 0.6701031
-##  [393] 0.8229167 0.6875000 0.8333333 0.7500000 0.6770833 0.6458333 0.6041667
-##  [400] 0.7272727 0.7525773 0.7395833 0.8125000 0.7500000 0.8229167 0.6666667
-##  [407] 0.7083333 0.7187500 0.7604167 0.8144330 0.5312500 0.6875000 0.8854167
-##  [414] 0.7916667 0.7187500 0.8020833 0.6701031 0.7812500 0.7187500 0.7812500
-##  [421] 0.6979167 0.7878788 0.6562500 0.7187500 0.8958333 0.8333333 0.6770833
-##  [428] 0.7708333 0.7604167 0.7916667 0.6250000 0.9062500 0.7187500 0.5520833
-##  [435] 0.8333333 0.8333333 0.7291667 0.9375000 0.7604167 0.7395833 0.9375000
-##  [442] 0.6770833 0.9375000 0.6666667 0.8333333 0.6354167 0.7708333 0.8645833
-##  [449] 0.7395833 0.8958333 0.8125000 0.7708333 0.5416667 0.6979167 0.9375000
-##  [456] 0.7187500 0.5520833 0.6770833 0.7291667 0.8854167 0.7812500 0.7083333
-##  [463] 0.8125000 0.7708333 0.6041667 0.7291667 0.8125000 0.7291667 0.6979167
-##  [470] 0.6875000 0.8437500 0.8020833 0.6979167 0.7708333 0.7812500 0.6979167
-##  [477] 0.6770833 0.8645833 0.6979167 0.8125000 0.8958333 0.7708333 0.8333333
-##  [484] 0.7604167 0.7525773 0.7395833 0.7604167 0.8645833 0.8020833 0.7291667
-##  [491] 0.9166667 0.8541667 0.7244898 0.7916667 0.7628866 0.8750000 0.8437500
-##  [498] 0.7187500 0.8229167 0.9270833 0.6145833 0.6666667 0.7291667 0.7291667
-##  [505] 0.6875000 0.8541667 0.8020833 0.6770833 0.6770833 0.7500000 0.8854167
-##  [512] 0.8125000 0.6979167 0.7291667 0.6597938 0.7916667 0.8750000 0.5520833
-##  [519] 0.8958333 0.7083333 0.9375000 0.8020833 0.8541667 0.7291667 0.8556701
-##  [526] 0.7500000 0.8645833 0.7083333 0.7604167 0.7812500 0.7395833 0.5729167
-##  [533] 0.8080808 0.6770833 0.7187500 0.8762887 0.8958333 0.6666667 0.8645833
-##  [540] 0.7916667 0.7187500 0.8541667 0.7083333 0.6562500 0.8125000 0.7291667
-##  [547] 0.7812500 0.8125000 0.6458333 0.8750000 0.8163265 0.8229167 0.7604167
-##  [554] 0.7083333 0.6979167 0.7500000 0.8229167 0.8229167 0.8958333 0.8333333
-##  [561] 0.7187500 0.8541667 0.6666667 0.7708333 0.7812500 0.8333333 0.6562500
-##  [568] 0.8645833 0.6875000 0.7708333 0.7604167 0.9166667 0.5463918 0.9062500
-##  [575] 0.8229167 0.5416667 0.8229167 0.8437500 0.7395833 0.8958333 0.8125000
-##  [582] 0.8229167 0.7395833 0.7812500 0.8229167 0.7812500 0.8854167 0.7113402
-##  [589] 0.8333333 0.7291667 0.7083333 0.7500000 0.7708333 0.8125000 0.7291667
-##  [596] 0.7083333 0.7291667 0.7916667 0.8229167 0.7916667 0.8333333 0.7291667
-##  [603] 0.6804124 0.6875000 0.8437500 0.8333333 0.8020833 0.7083333 0.8125000
-##  [610] 0.7812500 0.8645833 0.7395833 0.7708333 0.7708333 0.8854167 0.8229167
-##  [617] 0.7708333 0.8958333 0.6770833 0.5729167 0.8541667 0.8958333 0.7010309
-##  [624] 0.8350515 0.7395833 0.6979167 0.7291667 0.8854167 0.8125000 0.7187500
-##  [631] 0.8229167 0.7187500 0.6770833 0.7142857 0.7500000 0.8125000 0.8125000
-##  [638] 0.8541667 0.8958333 0.7500000 0.8854167 0.8020833 0.7083333 0.8229167
-##  [645] 0.8125000 0.7083333 0.6666667 0.5312500 0.8020833 0.8958333 0.7083333
-##  [652] 0.7812500 0.8437500 0.7500000 0.7500000 0.6875000 0.6875000 0.7812500
-##  [659] 0.8437500 0.7812500 0.6145833 0.6562500 0.6875000 0.6145833 0.8645833
-##  [666] 0.8229167 0.7291667 0.6770833 0.6875000 0.8645833 0.6770833 0.6979167
-##  [673] 0.7812500 0.7291667 0.6701031 0.8333333 0.7500000 0.7500000 0.8333333
-##  [680] 0.6666667 0.6354167 0.7291667 0.7812500 0.8750000 0.6494845 0.8437500
-##  [687] 0.8229167 0.8333333 0.7708333 0.6979167 0.7604167 0.8229167 0.8229167
-##  [694] 0.7395833 0.8333333 0.7291667 0.6875000 0.8645833 0.7291667 0.7187500
-##  [701] 0.8229167 0.6979167 0.8750000 0.7187500 0.7083333 0.8020833 0.7708333
-##  [708] 0.7083333 0.7812500 0.6875000 0.6562500 0.6082474 0.7395833 0.5257732
-##  [715] 0.7083333 0.7395833 0.6701031 0.7812500 0.7083333 0.7395833 0.7812500
-##  [722] 0.7604167 0.6979167 0.8229167 0.7708333 0.8865979 0.7187500 0.7604167
-##  [729] 0.7187500 0.6979167 0.8229167 0.7083333 0.8125000 0.7187500 0.6666667
-##  [736] 0.6666667 0.7708333 0.7812500 0.7731959 0.9166667 0.8541667 0.8437500
-##  [743] 0.8350515 0.7291667 0.7187500 0.7500000 0.7812500 0.7395833 0.6458333
-##  [750] 0.7187500 0.6979167 0.8750000 0.8750000 0.7083333 0.6979167 0.6666667
-##  [757] 0.8750000 0.8645833 0.7916667 0.7291667 0.8854167 0.7291667 0.7708333
-##  [764] 0.5520833 0.8958333 0.8333333 0.6770833 0.5208333 0.7083333 0.8541667
-##  [771] 0.8645833 0.7604167 0.7755102 0.8541667 0.5051546 0.7708333 0.7187500
-##  [778] 0.6458333 0.7812500 0.9375000 0.8541667 0.8979592 0.7500000 0.7916667
-##  [785] 0.8125000 0.6770833 0.8125000 0.6145833 0.7500000 0.8229167 0.7291667
-##  [792] 0.5833333 0.8541667 0.9062500 0.8125000 0.7708333 0.7395833 0.6562500
-##  [799] 0.7187500 0.5463918 0.9270833 0.7812500 0.7812500 0.6875000 0.6770833
-##  [806] 0.6979167 0.7113402 0.7500000 0.8333333 0.7916667 0.8750000 0.6250000
-##  [813] 0.8020833 0.8958333 0.8854167 0.8541667 0.6875000 0.7187500 0.7187500
-##  [820] 0.7812500 0.8020833 0.6979167 0.6979167 0.8229167 0.7083333 0.6666667
-##  [827] 0.6666667 0.7812500 0.7291667 0.8229167 0.7857143 0.8333333 0.6907216
-##  [834] 0.8437500 0.6875000 0.8333333 0.9270833 0.6875000 0.7010309 0.7291667
-##  [841] 0.6666667 0.6336634 0.8125000 0.8020833 0.6770833 0.8958333 0.7395833
-##  [848] 0.7628866 0.8229167 0.7083333 0.7708333 0.6875000 0.7291667 0.6666667
-##  [855] 0.7291667 0.7083333 0.6770833 0.7708333 0.7187500 0.8333333 0.6979167
-##  [862] 0.6770833 0.9062500 0.8854167 0.8229167 0.7812500 0.6979167 0.8229167
-##  [869] 0.8229167 0.7010309 0.7500000 0.7604167 0.8333333 0.8020833 0.8125000
-##  [876] 0.9166667 0.6875000 0.8958333 0.9270833 0.7812500 0.8958333 0.7395833
-##  [883] 0.6875000 0.6562500 0.6875000 0.8125000 0.7604167 0.6666667 0.7113402
-##  [890] 0.7083333 0.8958333 0.6562500 0.7500000 0.6666667 0.5729167 0.6666667
-##  [897] 0.8229167 0.7319588 0.7708333 0.6666667 0.7708333 0.8020833 0.7604167
-##  [904] 0.7708333 0.7916667 0.7604167 0.7916667 0.7604167 0.7291667 0.8854167
-##  [911] 0.7083333 0.5625000 0.8229167 0.5520833 0.7083333 0.8020833 0.6979167
-##  [918] 0.7319588 0.7187500 0.7010309 0.5312500 0.8125000 0.8020833 0.6875000
-##  [925] 0.6562500 0.7291667 0.8437500 0.7812500 0.7500000 0.7604167 0.8541667
-##  [932] 0.6770833 0.8854167 0.6145833 0.7395833 0.8229167 0.6875000 0.7187500
-##  [939] 0.7604167 0.6979167 0.7604167 0.8333333 0.7812500 0.7812500 0.8020833
-##  [946] 0.9062500 0.7731959 0.7604167 0.7113402 0.7604167 0.7083333 0.6979167
-##  [953] 0.8541667 0.6041667 0.7187500 0.8041237 0.8541667 0.8020833 0.7916667
-##  [960] 0.6875000 0.8020833 0.8437500 0.8854167 0.7708333 0.6458333 0.8541667
-##  [967] 0.7187500 0.7083333 0.6562500 0.8437500 0.6979167 0.8854167 0.9270833
-##  [974] 0.7604167 0.5729167 0.8437500 0.6562500 0.8125000 0.7708333 0.6041667
-##  [981] 0.7083333 0.6666667 0.7395833 0.5000000 0.6979167 0.6458333 0.8854167
-##  [988] 0.7500000 0.7187500 0.7604167 0.7187500 0.7113402 0.7395833 0.6875000
-##  [995] 0.8437500 0.7604167 0.7395833 0.7500000 0.7708333 0.8020833 0.9270833
-## [1002] 0.8437500 0.6979167 0.8229167 0.7708333 0.7916667 0.7812500 0.7708333
-## [1009] 0.8437500 0.7291667 0.7500000 0.7708333 0.8750000 0.5937500 0.8125000
-## [1016] 0.7291667 0.6907216 0.7812500 0.8125000 0.8229167 0.7113402 0.7422680
-## [1023] 0.7916667 0.8333333 0.7708333 0.6458333 0.8437500 0.9166667 0.7291667
-## [1030] 0.7708333 0.7500000 0.7812500 0.7187500 0.7083333 0.6562500 0.7187500
-## [1037] 0.6562500 0.9166667 0.8750000 0.8854167 0.8125000 0.8437500 0.7812500
-## [1044] 0.7916667 0.7395833 0.8125000 0.8541667 0.7187500 0.7916667 0.7083333
-## [1051] 0.7319588 0.7395833 0.8541667 0.7628866 0.8437500 0.9166667 0.5833333
-## [1058] 0.8125000 0.8125000 0.7500000 0.8541667 0.7916667 0.7083333 0.7916667
-## [1065] 0.7291667 0.8645833 0.5416667 0.8541667 0.6875000 0.7216495 0.8247423
-## [1072] 0.6770833 0.8541667 0.6666667 0.7291667 0.7812500 0.7812500 0.7083333
-## [1079] 0.6562500 0.7291667 0.7916667 0.6979167 0.8854167 0.7835052 0.7812500
-## [1086] 0.7604167 0.8125000 0.7291667 0.8333333 0.5312500 0.6979167 0.9166667
-## [1093] 0.7812500 0.7070707 0.8437500 0.7500000 0.8541667 0.8437500 0.6562500
-## [1100] 0.7604167 0.7291667 0.5937500 0.7812500 0.8125000 0.7083333 0.6562500
-## [1107] 0.6770833 0.5520833 0.6666667 0.8229167 0.7291667 0.9062500 0.6979167
-## [1114] 0.6969697 0.8750000 0.7395833 0.9166667 0.7812500 0.7395833 0.7604167
-## [1121] 0.8854167 0.9166667 0.7500000 0.8020833 0.7187500 0.7187500 0.7291667
-## [1128] 0.8229167 0.7500000 0.8229167 0.7187500 0.6458333 0.6666667 0.8229167
-## [1135] 0.7500000 0.5520833 0.8541667 0.7113402 0.7708333 0.8958333 0.7812500
-## [1142] 0.7291667 0.8750000 0.7291667 0.7083333 0.7187500 0.8333333 0.8333333
-## [1149] 0.8333333 0.7708333 0.7812500 0.6041667 0.8125000 0.5833333 0.8229167
-## [1156] 0.6907216 0.7395833 0.7291667 0.8958333 0.7708333 0.7708333 0.8125000
-## [1163] 0.6770833 0.8125000 0.7083333 0.8645833 0.8229167 0.7812500 0.7708333
-## [1170] 0.8020833 0.8125000 0.8541667 0.7500000 0.5520833 0.8020833 0.8854167
-## [1177] 0.7812500 0.8125000 0.8645833 0.9166667 0.8229167 0.6666667 0.7604167
-## [1184] 0.7083333 0.7604167 0.8229167 0.7187500 0.7812500 0.7187500 0.7395833
-## [1191] 0.8750000 0.7812500 0.7916667 0.7708333 0.8229167 0.7708333 0.7916667
-## [1198] 0.7604167 0.7812500 0.8333333 0.8229167 0.8020833 0.5520833 0.7500000
-## [1205] 0.7500000 0.8020833 0.8125000 0.7708333 0.8437500 0.7812500 0.6770833
-## [1212] 0.7422680 0.8659794 0.8041237 0.8125000 0.8437500 0.8645833 0.7812500
-## [1219] 0.8333333 0.6354167 0.8333333 0.6562500 0.8229167 0.9166667 0.8125000
-## [1226] 0.7812500 0.8958333 0.7395833 0.8645833 0.8541667 0.7291667 0.8645833
-## [1233] 0.8958333 0.7291667 0.7291667 0.8854167 0.7604167 0.7291667 0.8333333
-## [1240] 0.7916667 0.7187500 0.8645833 0.6250000 0.5416667 0.7500000 0.8333333
-## [1247] 0.8333333 0.6458333 0.6458333 0.7604167 0.7083333 0.6458333 0.7500000
-## [1254] 0.8229167 0.8645833 0.8333333 0.7916667 0.6875000 0.6979167 0.7291667
-## [1261] 0.8020833 0.6875000 0.8854167 0.7113402 0.7083333 0.9062500 0.6770833
-## [1268] 0.7708333 0.8020833 0.8125000 0.7395833 0.7525773 0.7812500 0.7291667
-## [1275] 0.7187500 0.6979167 0.8333333 0.8229167 0.6875000 0.8854167 0.7812500
-## [1282] 0.7708333 0.9062500 0.8541667 0.6666667 0.8125000 0.6979167 0.8125000
-## [1289] 0.7500000 0.7916667 0.7083333 0.7708333 0.6666667 0.7291667 0.7604167
-## [1296] 0.7187500 0.7083333 0.7525773 0.7812500 0.7083333 0.7291667 0.7812500
-## [1303] 0.8541667 0.7187500 0.8125000 0.7083333 0.7083333 0.8125000 0.6979167
-## [1310] 0.8020833 0.7812500 0.8645833 0.6979167 0.6979167 0.8125000 0.7916667
-## [1317] 0.8229167 0.7708333 0.7500000 0.8333333 0.8020833 0.6666667 0.6494845
-## [1324] 0.8541667 0.6875000 0.7604167 0.7812500 0.6562500 0.7187500 0.8125000
-## [1331] 0.9278351 0.8333333 0.7187500 0.7731959 0.7604167 0.8333333 0.7708333
-## [1338] 0.6666667 0.6666667 0.8645833 0.8125000 0.7916667 0.8333333 0.8229167
-## [1345] 0.9375000 0.7395833 0.7835052 0.6979167 0.7216495 0.7916667 0.5833333
-## [1352] 0.8854167 0.7604167 0.7916667 0.8333333 0.7916667 0.8020833 0.7291667
-## [1359] 0.7604167 0.7083333 0.8229167 0.7010309 0.7708333 0.8125000 0.9062500
-## [1366] 0.8854167 0.9062500 0.9166667 0.7812500 0.7916667 0.8229167 0.8437500
-## [1373] 0.8020833 0.6666667 0.8125000 0.6770833 0.8541667 0.8854167 0.8350515
-## [1380] 0.6979167 0.9062500 0.7187500 0.8750000 0.8541667 0.8958333 0.6770833
-## [1387] 0.8958333 0.6979167 0.8125000 0.8750000 0.7916667 0.6562500 0.6666667
-## [1394] 0.8854167 0.8437500 0.8020833 0.7916667 0.8437500 0.8437500 0.8020833
-## [1401] 0.6875000 0.7291667 0.7395833 0.7187500 0.8541667 0.7083333 0.7083333
-## [1408] 0.7395833 0.7708333 0.8020833 0.8020833 0.6354167 0.7083333 0.7291667
-## [1415] 0.9479167 0.9479167 0.7604167 0.8541667 0.7916667 0.7291667 0.8229167
-## [1422] 0.9166667 0.7812500 0.9375000 0.7916667 0.8229167 0.7083333 0.7083333
-## [1429] 0.7083333 0.7708333 0.4948454 0.7938144 0.6562500 0.8125000 0.8333333
-## [1436] 0.8541667 0.7708333 0.8645833 0.7083333 0.8020833 0.8229167 0.8854167
-## [1443] 0.7319588 0.5312500 0.7083333 0.7113402 0.6145833 0.8750000 0.7395833
-## [1450] 0.7500000 0.8125000 0.8020833 0.7395833 0.7291667 0.7083333 0.6875000
-## [1457] 0.7187500 0.7187500 0.7812500 0.6979167 0.7708333 0.8333333 0.7708333
-## [1464] 0.6666667 0.8958333 0.7291667 0.8020833 0.7291667 0.8125000 0.8333333
-## [1471] 0.7395833 0.8229167 0.9166667 0.5937500 0.8541667 0.8333333 0.7708333
-## [1478] 0.7604167 0.7291667 0.7708333 0.8229167 0.6979167 0.7812500 0.7500000
-## [1485] 0.7812500 0.8229167 0.9062500 0.6666667 0.8125000 0.9062500 0.8437500
-## [1492] 0.9479167 0.8020833 0.7083333 0.8854167 0.6770833 0.7070707 0.8854167
-## [1499] 0.7731959 0.8229167 0.7708333 0.9062500 0.7291667 0.8750000 0.6979167
-## [1506] 0.7916667 0.5937500 0.6250000 0.6875000 0.6458333 0.7500000 0.7500000
-## [1513] 0.9166667 0.8750000 0.7187500 0.8333333 0.9166667 0.8020833 0.6875000
-## [1520] 0.6458333 0.7500000 0.9166667 0.7500000 0.7916667 0.7731959 0.8437500
-## [1527] 0.8041237 0.7395833 0.7708333 0.7187500 0.7500000 0.8854167 0.7500000
-## [1534] 0.7291667 0.7812500 0.5104167 0.8125000 0.6770833 0.8854167 0.7708333
-## [1541] 0.8020833 0.8958333 0.5937500 0.9062500 0.9166667 0.7187500 0.5104167
-## [1548] 0.8645833 0.7291667 0.8750000 0.6666667 0.7500000 0.5625000 0.8333333
-## [1555] 0.7916667 0.7291667 0.7812500 0.7291667 0.7812500 0.6666667 0.7070707
-## [1562] 0.6666667 0.6666667 0.8125000 0.6666667 0.7395833 0.7604167 0.8229167
-## [1569] 0.6770833 0.7812500 0.8437500 0.6770833 0.7708333 0.8125000 0.8333333
-## [1576] 0.6666667 0.9166667 0.6145833 0.6875000 0.7812500 0.7500000 0.7916667
-## [1583] 0.8541667 0.8541667 0.6770833 0.8854167 0.7812500 0.8437500 0.8229167
-## [1590] 0.7604167 0.7187500 0.7812500 0.7500000 0.7916667 0.6666667 0.6875000
-## [1597] 0.9062500 0.7812500 0.9166667 0.7395833 0.7812500 0.7812500 0.7500000
-## [1604] 0.8750000 0.8437500 0.7083333 0.5670103 0.8958333 0.7291667 0.8333333
-## [1611] 0.7708333 0.7916667 0.8437500 0.8750000 0.7113402 0.7291667 0.7708333
-## [1618] 0.8958333 0.7291667 0.7500000 0.8437500 0.8333333 0.8163265 0.7812500
-## [1625] 0.7187500 0.7083333 0.8350515 0.8020833 0.7604167 0.8958333 0.7395833
-## [1632] 0.7083333 0.8437500 0.6770833 0.7187500 0.8020833 0.8020833 0.6666667
-## [1639] 0.7395833 0.8041237 0.8229167 0.8437500 0.8144330 0.7113402 0.7395833
-## [1646] 0.7187500 0.6666667 0.6875000 0.7083333 0.8541667 0.8125000 0.6770833
-## [1653] 0.7604167 0.7708333 0.7708333 0.8020833 0.7812500 0.7083333 0.7187500
-## [1660] 0.6770833 0.7395833 0.8125000 0.6666667 0.8541667 0.7395833 0.7708333
-## [1667] 0.8645833 0.8645833 0.7291667 0.7500000 0.7812500 0.8645833 0.7083333
-## [1674] 0.7083333 0.8854167 0.8958333 0.7291667 0.7083333 0.7187500 0.7187500
-## [1681] 0.7291667 0.8541667 0.9062500 0.8437500 0.7187500 0.8437500 0.8247423
-## [1688] 0.8541667 0.7291667 0.6979167 0.7525773 0.6907216 0.9270833 0.8181818
-## [1695] 0.8750000 0.6875000 0.6979167 0.7187500 0.7755102 0.6979167 0.6979167
-## [1702] 0.5729167 0.9062500 0.8645833 0.8541667 0.6701031 0.8541667 0.6875000
-## [1709] 0.7812500 0.7604167 0.6770833 0.7040816 0.8958333 0.8125000 0.9062500
-## [1716] 0.8125000 0.7113402 0.7708333 0.7291667 0.8750000 0.6979167 0.6666667
-## [1723] 0.7708333 0.8229167 0.7708333 0.7291667 0.7500000 0.7395833 0.8541667
-## [1730] 0.7604167 0.8645833 0.7187500 0.7187500 0.7916667 0.8333333 0.8020833
-## [1737] 0.6907216 0.5520833 0.9166667 0.8541667 0.6767677 0.7395833 0.7708333
-## [1744] 0.7708333 0.7083333 0.8958333 0.8541667 0.7916667 0.7395833 0.8333333
-## [1751] 0.8333333 0.8645833 0.7708333 0.7604167 0.8541667 0.9166667 0.8541667
-## [1758] 0.6875000 0.9062500 0.7395833 0.8125000 0.8333333 0.6458333 0.7083333
-## [1765] 0.7500000 0.7422680 0.5833333 0.7500000 0.7812500 0.7187500 0.6666667
-## [1772] 0.6666667 0.8437500 0.8854167 0.8229167 0.7604167 0.5000000 0.7291667
-## [1779] 0.7708333 0.7812500 0.7113402 0.7500000 0.7187500 0.8125000 0.9166667
-## [1786] 0.7708333 0.5312500 0.8541667 0.7187500 0.7187500 0.8958333 0.8645833
-## [1793] 0.8125000 0.5937500 0.7708333 0.7187500 0.8541667 0.5520833 0.7395833
-## [1800] 0.7708333 0.7708333 0.7708333 0.8020833 0.8333333 0.6666667 0.7500000
-## [1807] 0.7916667 0.9062500 0.8125000 0.7708333 0.6145833 0.6354167 0.6041667
-## [1814] 0.8020833 0.8125000 0.8020833 0.8125000 0.5729167 0.7083333 0.7500000
-## [1821] 0.7083333 0.7604167 0.7216495 0.8750000 0.8020833 0.8556701 0.7916667
-## [1828] 0.8125000 0.6875000 0.8020833 0.7500000 0.8125000 0.7708333 0.8020833
-## [1835] 0.7083333 0.7395833 0.7083333 0.7083333 0.7395833 0.8020833 0.5520833
-## [1842] 0.7395833 0.8229167 0.8333333 0.7812500 0.9166667 0.7916667 0.8333333
-## [1849] 0.7291667 0.7395833 0.7604167 0.8333333 0.9062500 0.7187500 0.8958333
-## [1856] 0.7187500 0.7083333 0.8645833 0.7395833 0.7525773 0.8750000 0.8541667
-## [1863] 0.7083333 0.8437500 0.6875000 0.8125000 0.8854167 0.5937500 0.7916667
-## [1870] 0.8125000 0.8541667 0.7187500 0.6770833 0.9479167 0.8437500 0.8958333
-## [1877] 0.6666667 0.8645833 0.8020833 0.7916667 0.8020833 0.8125000 0.7500000
-## [1884] 0.8854167 0.6145833 0.8854167 0.8541667 0.9166667 0.6979167 0.8854167
-## [1891] 0.7395833 0.7373737 0.8125000 0.7187500 0.8125000 0.7083333 0.6770833
-## [1898] 0.7916667 0.6562500 0.7604167 0.8750000 0.5312500 0.8125000 0.8854167
-## [1905] 0.8854167 0.8854167 0.7187500 0.7291667 0.8333333 0.9375000 0.7500000
-## [1912] 0.7395833 0.7500000 0.6979167 0.6979167 0.7708333 0.6979167 0.9375000
-## [1919] 0.7812500 0.7708333 0.7083333 0.7291667 0.8125000 0.7916667 0.8645833
-## [1926] 0.7500000 0.7083333 0.7083333 0.6875000 0.7708333 0.7291667 0.8437500
-## [1933] 0.8750000 0.6979167 0.7604167 0.7187500 0.6458333 0.7187500 0.9062500
-## [1940] 0.7604167 0.8229167 0.6666667 0.7291667 0.8541667 0.8854167 0.8229167
-## [1947] 0.7708333 0.6875000 0.6875000 0.7187500 0.8645833 0.7395833 0.7708333
-## [1954] 0.8958333 0.7500000 0.7500000 0.8645833 0.7291667 0.8333333 0.6979167
-## [1961] 0.7187500 0.7708333 0.7395833 0.7812500 0.8541667 0.6666667 0.7812500
-## [1968] 0.7187500 0.8125000 0.7812500 0.8645833 0.6770833 0.8645833 0.7916667
-## [1975] 0.7500000 0.7500000 0.7395833 0.9375000 0.6875000 0.8645833 0.6979167
-## [1982] 0.7812500 0.8541667 0.8229167 0.7500000 0.7291667 0.7395833 0.8020833
-## [1989] 0.9062500 0.8541667 0.7395833 0.8125000 0.8437500 0.7812500 0.6770833
-## [1996] 0.7916667 0.8750000 0.6458333 0.9062500 0.6979167 0.6666667 0.8125000
-## [2003] 0.6770833 0.7500000 0.9166667 0.6979167 0.7604167 0.9062500 0.9270833
-## [2010] 0.8020833 0.7187500 0.7395833 0.7395833 0.7604167 0.6875000 0.7010309
-## [2017] 0.8645833 0.6969697 0.8541667 0.6770833 0.7959184 0.7395833 0.9166667
-## [2024] 0.8659794 0.7395833 0.7291667 0.8854167 0.7708333 0.9062500 0.6458333
-## [2031] 0.7187500 0.9166667 0.8265306 0.8020833 0.6979167 0.8020833 0.8229167
-## [2038] 0.7291667 0.7083333 0.8020833 0.7938144 0.7291667 0.6875000 0.6770833
-## [2045] 0.6979167 0.6770833 0.7604167 0.6875000 0.7187500 0.6354167 0.9062500
-## [2052] 0.6666667 0.7083333 0.8020833 0.9166667 0.6979167 0.6770833 0.8125000
-## [2059] 0.7395833 0.7604167 0.8437500 0.6875000 0.9062500 0.7395833 0.6875000
-## [2066] 0.7291667 0.6770833 0.9166667 0.6666667 0.9166667 0.5729167 0.7291667
-## [2073] 0.6979167 0.9062500 0.8020833 0.6979167 0.8350515 0.7916667 0.8229167
-## [2080] 0.7812500 0.6354167 0.6770833 0.5937500 0.6770833 0.8229167 0.7604167
-## [2087] 0.8125000 0.6701031 0.7916667 0.5257732 0.8645833 0.8958333 0.8645833
-## [2094] 0.6875000 0.7083333 0.7083333 0.7291667 0.7500000 0.8229167 0.6770833
-## [2101] 0.6770833 0.6458333 0.7604167 0.7812500 0.8333333 0.5208333 0.7083333
-## [2108] 0.7525773 0.7373737 0.7291667 0.7916667 0.8437500 0.7812500 0.6666667
-## [2115] 0.7395833 0.6458333 0.7916667 0.6666667 0.8229167 0.7604167 0.6875000
-## [2122] 0.7113402 0.8541667 0.7083333 0.5416667 0.6666667 0.6770833 0.8333333
-## [2129] 0.6907216 0.8750000 0.7708333 0.6979167 0.7395833 0.8750000 0.6666667
-## [2136] 0.9375000 0.6875000 0.5937500 0.7500000 0.8556701 0.7708333 0.7187500
-## [2143] 0.7187500 0.7938144 0.6354167 0.7291667 0.7291667 0.7083333 0.8229167
-## [2150] 0.7291667 0.7083333 0.7916667 0.5979381 0.7291667 0.8333333 0.8437500
-## [2157] 0.6770833 0.7291667 0.7708333 0.7916667 0.8333333 0.7604167 0.8020833
-## [2164] 0.8125000 0.7187500 0.7812500 0.7500000 0.8541667 0.6666667 0.8020833
-## [2171] 0.5416667 0.7500000 0.7187500 0.6875000 0.7216495 0.7291667 0.7187500
-## [2178] 0.8437500 0.6666667 0.7708333 0.7395833 0.6041667 0.8333333 0.8020833
-## [2185] 0.8750000 0.8854167 0.8333333 0.8645833 0.7083333 0.8020833 0.7500000
-## [2192] 0.8125000 0.7187500 0.7187500 0.8020833 0.7708333 0.8750000 0.7500000
-## [2199] 0.7395833 0.6494845 0.7291667 0.7916667 0.6458333 0.8020833 0.8750000
-## [2206] 0.7395833 0.6145833 0.7500000 0.7142857 0.8020833 0.5937500 0.6666667
-## [2213] 0.8645833 0.6701031 0.8437500 0.7291667 0.7604167 0.6979167 0.7395833
-## [2220] 0.7395833 0.7500000 0.7395833 0.7083333 0.6458333 0.8020833 0.7187500
-## [2227] 0.5833333 0.8020833 0.8125000 0.7395833 0.7083333 0.7916667 0.8854167
-## [2234] 0.6562500 0.6979167 0.8645833 0.6875000 0.8854167 0.6666667 0.7187500
-## [2241] 0.7938144 0.8229167 0.7083333 0.8350515 0.7916667 0.7812500 0.7187500
-## [2248] 0.6979167 0.6145833 0.6875000 0.8020833 0.8333333 0.6875000 0.8645833
-## [2255] 0.7083333 0.6666667 0.6979167 0.8229167 0.7010309 0.7500000 0.7142857
-## [2262] 0.5937500 0.7812500 0.6979167 0.6041667 0.8333333 0.7291667 0.7187500
-## [2269] 0.7835052 0.7525773 0.7916667 0.7500000 0.7708333 0.7291667 0.5625000
-## [2276] 0.7083333 0.7187500 0.8229167 0.6562500 0.7291667 0.5625000 0.7812500
-## [2283] 0.7916667 0.7291667 0.7187500 0.7500000 0.5520833 0.6979167 0.7291667
-## [2290] 0.6770833 0.6562500 0.8333333 0.5520833 0.8437500 0.7604167 0.8541667
-## [2297] 0.7500000 0.7604167 0.6122449 0.7010309 0.6770833 0.6041667 0.7708333
-## [2304] 0.6979167 0.7083333 0.7187500 0.7708333 0.6354167 0.7812500 0.8541667
-## [2311] 0.7916667 0.8333333 0.9062500 0.7708333 0.6770833 0.6250000 0.6875000
-## [2318] 0.7187500 0.7291667 0.5520833 0.5416667 0.5312500 0.8144330 0.7708333
-## [2325] 0.7604167 0.8333333 0.7708333 0.7731959 0.7708333 0.7319588 0.6875000
-## [2332] 0.8125000 0.5257732 0.7500000 0.8437500 0.6458333 0.8020833 0.5520833
-## [2339] 0.8125000 0.7422680 0.8229167 0.6391753 0.6250000 0.6666667 0.7812500
-## [2346] 0.7187500 0.7708333 0.8229167 0.7395833 0.6979167 0.7708333 0.7500000
-## [2353] 0.6666667 0.6666667 0.6979167 0.5729167 0.8020833 0.7083333 0.7708333
-## [2360] 0.8333333 0.7708333 0.7812500 0.6875000 0.7187500 0.7604167 0.7291667
-## [2367] 0.8437500 0.7291667 0.6979167 0.5520833 0.8020833 0.7812500 0.7604167
-## [2374] 0.7604167 0.6666667 0.7083333 0.7812500 0.7291667 0.7291667 0.6250000
-## [2381] 0.6770833 0.7500000 0.6979167 0.7083333 0.7731959 0.7604167 0.7083333
-## [2388] 0.5937500 0.7916667 0.5416667 0.5312500 0.7395833 0.7500000 0.7083333
-## [2395] 0.8854167 0.7187500 0.8333333 0.7395833 0.8854167 0.7812500 0.6458333
-## [2402] 0.6354167 0.7083333 0.6145833 0.7604167 0.7812500 0.6875000 0.7395833
-## [2409] 0.6875000 0.7708333 0.7812500 0.7604167 0.5729167 0.6562500 0.7731959
-## [2416] 0.5773196 0.5000000 0.7604167 0.6250000 0.6979167 0.6458333 0.7395833
-## [2423] 0.7708333 0.6979167 0.7083333 0.6875000 0.6666667 0.7216495 0.5520833
-## [2430] 0.8333333 0.6666667 0.9166667 0.5520833 0.5520833 0.7187500 0.8750000
-## [2437] 0.7500000 0.7500000 0.9166667 0.6145833 0.8125000 0.6666667 0.7187500
-## [2444] 0.6979167 0.7448980 0.7187500 0.7812500 0.7010309 0.7812500 0.7187500
-## [2451] 0.5520833 0.6979167 0.5625000 0.5416667 0.6250000 0.7395833 0.6770833
-## [2458] 0.9375000 0.6979167 0.8229167 0.6979167 0.6458333 0.7604167 0.6145833
-## [2465] 0.7604167 0.6250000 0.7812500 0.6185567 0.7187500 0.5979381 0.8125000
-## [2472] 0.8125000 0.5729167 0.6354167 0.8437500 0.8750000 0.8125000 0.6354167
-## [2479] 0.7708333 0.7291667 0.6979167 0.8125000 0.5520833 0.7083333 0.7187500
-## [2486] 0.8762887 0.7187500 0.8125000 0.7812500 0.7525773 0.7291667 0.7500000
-## [2493] 0.8229167 0.7604167 0.6562500 0.7070707 0.7187500 0.5729167 0.8333333
-## [2500] 0.8125000 0.7291667 0.8854167 0.6562500 0.7291667 0.7812500 0.5773196
-## [2507] 0.6145833 0.6562500 0.7187500 0.7500000 0.7187500 0.8125000 0.7500000
-## [2514] 0.7083333 0.5937500 0.5000000 0.6770833 0.6458333 0.7812500 0.6145833
-## [2521] 0.7083333 0.7708333 0.7070707 0.6562500 0.7395833 0.7395833 0.7187500
-## [2528] 0.7291667 0.6458333 0.7083333 0.5520833 0.8350515 0.7604167 0.8645833
-## [2535] 0.6562500 0.7291667 0.7083333 0.7604167 0.7291667 0.6875000 0.7291667
-## [2542] 0.7291667 0.7291667 0.6979167 0.7083333 0.8750000 0.6666667 0.8229167
-## [2549] 0.7291667 0.6185567 0.6666667 0.6082474 0.8750000 0.6875000 0.8020833
-## [2556] 0.7291667 0.6666667 0.5937500 0.8750000 0.6666667 0.6875000 0.6250000
-## [2563] 0.7187500 0.7812500 0.7291667 0.5312500 0.7291667 0.7916667 0.7604167
-## [2570] 0.7187500 0.6562500 0.5520833 0.6979167 0.6666667 0.8020833 0.7812500
-## [2577] 0.6145833 0.6250000 0.8333333 0.7187500 0.7395833 0.5937500 0.8020833
-## [2584] 0.7083333 0.5833333 0.6979167 0.7395833 0.7422680 0.5520833 0.7395833
-## [2591] 0.8958333 0.7291667 0.5833333 0.6875000 0.6562500 0.5937500 0.6250000
-## [2598] 0.7083333 0.7083333 0.7708333 0.7395833 0.5729167 0.6288660 0.5416667
-## [2605] 0.8020833 0.5625000 0.7500000 0.7708333 0.9166667 0.6875000 0.7291667
-## [2612] 0.6770833 0.7291667 0.7187500 0.7187500 0.6145833 0.5312500 0.6979167
-## [2619] 0.6979167 0.6041667 0.7291667 0.8125000 0.7708333 0.8020833 0.7395833
-## [2626] 0.7500000 0.6770833 0.6354167 0.6979167 0.6666667 0.7187500 0.6354167
-## [2633] 0.8750000 0.6979167 0.7916667 0.7708333 0.7187500 0.6562500 0.6354167
-## [2640] 0.6562500 0.7291667 0.6562500 0.7216495 0.7291667 0.7083333 0.7628866
-## [2647] 0.6530612 0.9062500 0.8453608 0.5416667 0.7916667 0.8437500 0.5520833
-## [2654] 0.7395833 0.7916667 0.6354167 0.5937500 0.6666667 0.7812500 0.7291667
-## [2661] 0.6979167 0.7187500 0.5520833 0.5416667 0.7708333 0.8125000 0.7916667
-## [2668] 0.6562500 0.8333333 0.6979167 0.7500000 0.7525773 0.8229167 0.7395833
-## [2675] 0.7708333 0.6979167 0.6979167 0.7604167 0.5625000 0.5312500 0.7708333
-## [2682] 0.7395833 0.7395833 0.6770833 0.7083333 0.7708333 0.7291667 0.8125000
-## [2689] 0.7708333 0.6666667 0.6458333 0.8125000 0.7500000 0.6875000 0.7083333
-## [2696] 0.6979167 0.6770833 0.6562500 0.7708333 0.6875000 0.7916667 0.7708333
-## [2703] 0.6562500 0.5520833 0.7604167 0.7604167 0.6666667 0.7291667 0.7395833
-## [2710] 0.7500000 0.7187500 0.8125000 0.7708333 0.6458333 0.6875000 0.7083333
-## [2717] 0.6979167 0.5416667 0.6041667 0.7291667 0.6041667 0.6979167 0.7604167
-## [2724] 0.5729167 0.6875000 0.6562500 0.7835052 0.7187500 0.7083333 0.6979167
-## [2731] 0.6979167 0.7291667 0.7395833 0.8125000 0.7319588 0.6770833 0.6770833
-## [2738] 0.7291667 0.7708333 0.7708333 0.7708333 0.7187500 0.5520833 0.6875000
-## [2745] 0.6041667 0.7395833 0.7291667 0.5625000 0.7083333 0.7187500 0.6041667
-## [2752] 0.7395833 0.7187500 0.7083333 0.6562500 0.6666667 0.6666667 0.7291667
-## [2759] 0.6701031
-## Levels: 0 1 2
+##    [1] 0.6979167 0.7500000 0.8437500 0.7500000 0.8333333 0.8645833 0.5773196
+##    [8] 0.7755102 0.6391753 0.7083333 0.7708333 0.8229167 0.5773196 0.7812500
+##   [15] 0.6562500 0.7708333 0.7083333 0.9375000 0.6250000 0.5625000 0.7395833
+##   [22] 0.7395833 0.7708333 0.6145833 0.7187500 0.7812500 0.8333333 0.8125000
+##   [29] 0.7395833 0.8333333 0.7395833 0.7187500 0.8333333 0.6082474 0.8854167
+##   [36] 0.8020833 0.5625000 0.6224490 0.8854167 0.8333333 0.8854167 0.8125000
+##   [43] 0.8229167 0.8333333 0.6875000 0.8333333 0.8958333 0.7916667 0.8229167
+##   [50] 0.6082474 0.8125000 0.8333333 0.7708333 0.7604167 0.7916667 0.8541667
+##   [57] 0.8541667 0.8125000 0.8958333 0.7087379 0.5625000 0.7395833 0.9375000
+##   [64] 0.7291667 0.8645833 0.7916667 0.8437500 0.8333333 0.7395833 0.8333333
+##   [71] 0.7500000 0.6666667 0.7708333 0.9166667 0.7708333 0.9166667 0.9062500
+##   [78] 0.7500000 0.8958333 0.6770833 0.6979167 0.8645833 0.8762887 0.5520833
+##   [85] 0.8333333 0.6458333 0.6875000 0.8750000 0.7708333 0.6979167 0.6701031
+##   [92] 0.8333333 0.8020833 0.8437500 0.8854167 0.8437500 0.6875000 0.6597938
+##   [99] 0.7938144 0.7083333 0.7708333 0.6041667 0.7500000 0.8333333 0.6666667
+##  [106] 0.7500000 0.9583333 0.8125000 0.8437500 0.7395833 0.8020833 0.8020833
+##  [113] 0.6979167 0.6185567 0.7083333 0.6250000 0.8645833 0.5937500 0.8229167
+##  [120] 0.7083333 0.8437500 0.8333333 0.6354167 0.8125000 0.8645833 0.7708333
+##  [127] 0.6562500 0.6875000 0.9062500 0.6597938 0.8437500 0.7395833 0.8854167
+##  [134] 0.7291667 0.7812500 0.8333333 0.7187500 0.6458333 0.8437500 0.6979167
+##  [141] 0.7395833 0.8041237 0.8125000 0.8125000 0.7708333 0.7604167 0.7500000
+##  [148] 0.7291667 0.5625000 0.8229167 0.6666667 0.8958333 0.8020833 0.8333333
+##  [155] 0.7604167 0.7812500 0.8125000 0.7083333 0.7916667 0.7916667 0.8958333
+##  [162] 0.7916667 0.8854167 0.7708333 0.7083333 0.6979167 0.7291667 0.7812500
+##  [169] 0.8750000 0.8020833 0.6354167 0.8333333 0.6145833 0.7187500 0.7812500
+##  [176] 0.7812500 0.7812500 0.8854167 0.7708333 0.8645833 0.6666667 0.6458333
+##  [183] 0.7916667 0.8020833 0.7500000 0.7395833 0.7083333 0.7395833 0.7395833
+##  [190] 0.8541667 0.7916667 0.7916667 0.7500000 0.8750000 0.7083333 0.8645833
+##  [197] 0.6770833 0.7916667 0.7291667 0.8333333 0.7525773 0.8020833 0.7604167
+##  [204] 0.8854167 0.6875000 0.7916667 0.7708333 0.7604167 0.7083333 0.7291667
+##  [211] 0.7604167 0.7400000 0.6562500 0.7708333 0.6979167 0.7708333 0.7812500
+##  [218] 0.6979167 0.8333333 0.5833333 0.7187500 0.8020833 0.5208333 0.6458333
+##  [225] 0.8645833 0.5625000 0.6494845 0.8229167 0.7708333 0.8333333 0.8333333
+##  [232] 0.7291667 0.6562500 0.6804124 0.7916667 0.7604167 0.8854167 0.6701031
+##  [239] 0.7187500 0.8229167 0.7083333 0.7500000 0.7708333 0.7916667 0.8229167
+##  [246] 0.7916667 0.8437500 0.5416667 0.8229167 0.7708333 0.7291667 0.7916667
+##  [253] 0.8437500 0.7604167 0.6562500 0.7812500 0.7812500 0.7604167 0.6145833
+##  [260] 0.7083333 0.6979167 0.8645833 0.8247423 0.6875000 0.9166667 0.6875000
+##  [267] 0.7812500 0.8229167 0.7083333 0.8229167 0.6770833 0.8125000 0.6354167
+##  [274] 0.7604167 0.6145833 0.7272727 0.8958333 0.6562500 0.8645833 0.8865979
+##  [281] 0.5416667 0.7938144 0.7708333 0.7916667 0.6145833 0.7500000 0.6562500
+##  [288] 0.5416667 0.8437500 0.7291667 0.8333333 0.7916667 0.7395833 0.8958333
+##  [295] 0.6875000 0.7812500 0.8125000 0.6666667 0.6354167 0.7812500 0.8020833
+##  [302] 0.7708333 0.6770833 0.7604167 0.8645833 0.8125000 0.6770833 0.8437500
+##  [309] 0.5729167 0.6145833 0.7395833 0.8041237 0.9479167 0.7187500 0.7812500
+##  [316] 0.8229167 0.6354167 0.6979167 0.6354167 0.7291667 0.7083333 0.8125000
+##  [323] 0.7812500 0.8958333 0.7083333 0.8020833 0.7187500 0.8333333 0.8865979
+##  [330] 0.7291667 0.8125000 0.8020833 0.7916667 0.8020833 0.5729167 0.7604167
+##  [337] 0.7708333 0.8333333 0.7395833 0.8041237 0.8125000 0.8541667 0.8333333
+##  [344] 0.7812500 0.6979167 0.6979167 0.9062500 0.6458333 0.8645833 0.7916667
+##  [351] 0.7395833 0.9062500 0.7604167 0.6666667 0.6875000 0.7812500 0.7187500
+##  [358] 0.8229167 0.5000000 0.8229167 0.5000000 0.7604167 0.8437500 0.8645833
+##  [365] 0.6354167 0.7083333 0.7187500 0.6979167 0.9062500 0.6562500 0.7010309
+##  [372] 0.9062500 0.6597938 0.6288660 0.7187500 0.7500000 0.8125000 0.9166667
+##  [379] 0.5729167 0.7604167 0.8865979 0.5729167 0.8144330 0.8229167 0.6770833
+##  [386] 0.7291667 0.7812500 0.7604167 0.7604167 0.7083333 0.7291667 0.7916667
+##  [393] 0.7395833 0.7500000 0.7083333 0.7708333 0.7187500 0.6875000 0.7812500
+##  [400] 0.7500000 0.8958333 0.7395833 0.6770833 0.7500000 0.8333333 0.7400000
+##  [407] 0.7812500 0.8020833 0.5416667 0.7395833 0.7187500 0.6224490 0.7395833
+##  [414] 0.7291667 0.6979167 0.9062500 0.7291667 0.7916667 0.6770833 0.7187500
+##  [421] 0.7395833 0.7708333 0.7604167 0.7812500 0.6562500 0.6979167 0.7040816
+##  [428] 0.6145833 0.8020833 0.6562500 0.7812500 0.8645833 0.7916667 0.7938144
+##  [435] 0.6875000 0.7422680 0.5937500 0.7395833 0.7187500 0.5520833 0.7500000
+##  [442] 0.7812500 0.7291667 0.8541667 0.6979167 0.9166667 0.7187500 0.6458333
+##  [449] 0.8020833 0.7708333 0.8645833 0.8333333 0.5312500 0.7916667 0.5520833
+##  [456] 0.7500000 0.5729167 0.9062500 0.7812500 0.5773196 0.6875000 0.8854167
+##  [463] 0.6770833 0.6354167 0.8020833 0.8958333 0.7604167 0.8020833 0.6458333
+##  [470] 0.8958333 0.7708333 0.7604167 0.7604167 0.6979167 0.8020833 0.7708333
+##  [477] 0.9166667 0.7708333 0.9062500 0.7083333 0.8229167 0.7708333 0.7916667
+##  [484] 0.7291667 0.7708333 0.9375000 0.7395833 0.7395833 0.8453608 0.8020833
+##  [491] 0.8854167 0.7708333 0.8333333 0.6875000 0.8247423 0.8333333 0.8645833
+##  [498] 0.6562500 0.6250000 0.8333333 0.7916667 0.6458333 0.7812500 0.7604167
+##  [505] 0.6770833 0.8750000 0.8020833 0.7708333 0.5520833 0.7604167 0.9166667
+##  [512] 0.7395833 0.6875000 0.7604167 0.6770833 0.7187500 0.6666667 0.9062500
+##  [519] 0.7812500 0.8125000 0.7187500 0.7346939 0.8969072 0.8750000 0.7291667
+##  [526] 0.8645833 0.7916667 0.5833333 0.6770833 0.7604167 0.8020833 0.6666667
+##  [533] 0.7500000 0.7708333 0.6979167 0.8229167 0.6875000 0.6145833 0.9072165
+##  [540] 0.8541667 0.7291667 0.7187500 0.9166667 0.7291667 0.7083333 0.8020833
+##  [547] 0.8333333 0.7916667 0.6979167 0.7916667 0.8645833 0.7604167 0.7395833
+##  [554] 0.7187500 0.7395833 0.7187500 0.8125000 0.6770833 0.7604167 0.8854167
+##  [561] 0.8854167 0.8541667 0.7187500 0.7916667 0.8333333 0.7395833 0.6562500
+##  [568] 0.7916667 0.8229167 0.6979167 0.9278351 0.8020833 0.6354167 0.7812500
+##  [575] 0.8333333 0.8020833 0.7395833 0.7395833 0.8125000 0.7708333 0.6979167
+##  [582] 0.6770833 0.7916667 0.8645833 0.7708333 0.7291667 0.7187500 0.8854167
+##  [589] 0.8333333 0.8333333 0.6666667 0.7812500 0.8333333 0.7291667 0.6562500
+##  [596] 0.6979167 0.7708333 0.7916667 0.7708333 0.8541667 0.7938144 0.7708333
+##  [603] 0.7812500 0.7708333 0.8750000 0.8645833 0.6562500 0.6250000 0.6770833
+##  [610] 0.7395833 0.8958333 0.7916667 0.7812500 0.6562500 0.7187500 0.7422680
+##  [617] 0.6250000 0.6979167 0.6875000 0.7525773 0.8229167 0.8229167 0.8020833
+##  [624] 0.7916667 0.7395833 0.7812500 0.6666667 0.6666667 0.7500000 0.6041667
+##  [631] 0.7083333 0.7812500 0.6562500 0.8645833 0.6979167 0.8645833 0.8125000
+##  [638] 0.8437500 0.7500000 0.8125000 0.8333333 0.8125000 0.8229167 0.8020833
+##  [645] 0.8020833 0.8020833 0.8958333 0.6666667 0.6562500 0.7395833 0.7500000
+##  [652] 0.7500000 0.9375000 0.8020833 0.8854167 0.6875000 0.8125000 0.7708333
+##  [659] 0.7653061 0.7395833 0.5937500 0.8020833 0.8854167 0.7083333 0.5520833
+##  [666] 0.8125000 0.8229167 0.7272727 0.7187500 0.6145833 0.8020833 0.8958333
+##  [673] 0.8958333 0.7083333 0.7604167 0.7708333 0.8229167 0.8333333 0.8645833
+##  [680] 0.7291667 0.6145833 0.8437500 0.8125000 0.7187500 0.7083333 0.8229167
+##  [687] 0.8854167 0.7916667 0.8750000 0.7291667 0.6666667 0.8125000 0.7708333
+##  [694] 0.6875000 0.8125000 0.8020833 0.7395833 0.7422680 0.7500000 0.6041667
+##  [701] 0.6354167 0.6770833 0.6562500 0.5729167 0.7395833 0.6562500 0.7395833
+##  [708] 0.6875000 0.7500000 0.6666667 0.8125000 0.6666667 0.8659794 0.9270833
+##  [715] 0.8958333 0.7604167 0.5625000 0.7395833 0.7812500 0.8750000 0.5520833
+##  [722] 0.7604167 0.7083333 0.8020833 0.8144330 0.6875000 0.6979167 0.7395833
+##  [729] 0.7812500 0.8229167 0.7187500 0.7422680 0.7291667 0.8854167 0.6979167
+##  [736] 0.7216495 0.6875000 0.5416667 0.6804124 0.8229167 0.7395833 0.6562500
+##  [743] 0.7604167 0.8750000 0.7187500 0.9062500 0.5833333 0.7187500 0.7083333
+##  [750] 0.8125000 0.8750000 0.7083333 0.7604167 0.6979167 0.6875000 0.8958333
+##  [757] 0.7916667 0.6979167 0.6458333 0.8854167 0.8333333 0.8020833 0.8854167
+##  [764] 0.7812500 0.6666667 0.8750000 0.7604167 0.7395833 0.6145833 0.7040816
+##  [771] 0.8125000 0.7291667 0.6666667 0.6979167 0.6354167 0.5625000 0.8958333
+##  [778] 0.8333333 0.8854167 0.7812500 0.7187500 0.7187500 0.7916667 0.9175258
+##  [785] 0.8854167 0.7187500 0.8333333 0.7291667 0.8041237 0.8125000 0.8333333
+##  [792] 0.8041237 0.8020833 0.8958333 0.6562500 0.7812500 0.6979167 0.8645833
+##  [799] 0.8125000 0.7083333 0.6666667 0.7083333 0.6979167 0.8020833 0.6804124
+##  [806] 0.8125000 0.6875000 0.8020833 0.7812500 0.7500000 0.6391753 0.7187500
+##  [813] 0.8229167 0.8333333 0.5670103 0.8750000 0.8020833 0.7916667 0.7812500
+##  [820] 0.6875000 0.6562500 0.8020833 0.8750000 0.8125000 0.7916667 0.7708333
+##  [827] 0.7604167 0.8125000 0.7291667 0.7708333 0.7500000 0.6875000 0.7291667
+##  [834] 0.5729167 0.8958333 0.7916667 0.6458333 0.8229167 0.8125000 0.6875000
+##  [841] 0.6666667 0.6666667 0.6597938 0.7083333 0.7187500 0.8437500 0.8125000
+##  [848] 0.8333333 0.8020833 0.8437500 0.6979167 0.7346939 0.7708333 0.8125000
+##  [855] 0.8229167 0.8125000 0.8125000 0.8333333 0.7500000 0.8125000 0.5520833
+##  [862] 0.7500000 0.7187500 0.7291667 0.7604167 0.7708333 0.6458333 0.6770833
+##  [869] 0.7500000 0.6875000 0.8437500 0.7604167 0.6354167 0.7500000 0.7812500
+##  [876] 0.7812500 0.6770833 0.9166667 0.8958333 0.8229167 0.8229167 0.8020833
+##  [883] 0.7291667 0.7708333 0.7916667 0.7812500 0.8437500 0.8762887 0.6770833
+##  [890] 0.8229167 0.7319588 0.9270833 0.9270833 0.8437500 0.7395833 0.8020833
+##  [897] 0.7395833 0.7083333 0.7812500 0.7500000 0.8437500 0.8854167 0.8762887
+##  [904] 0.6875000 0.7395833 0.7604167 0.6875000 0.7604167 0.7500000 0.6804124
+##  [911] 0.7395833 0.7187500 0.7083333 0.7500000 0.6666667 0.7083333 0.7708333
+##  [918] 0.7083333 0.7291667 0.8958333 0.7708333 0.8125000 0.6770833 0.5833333
+##  [925] 0.6666667 0.6145833 0.8020833 0.7916667 0.8229167 0.6875000 0.8437500
+##  [932] 0.7395833 0.7916667 0.7604167 0.7500000 0.7916667 0.7812500 0.7187500
+##  [939] 0.8750000 0.8333333 0.8020833 0.7708333 0.8854167 0.6354167 0.8125000
+##  [946] 0.6875000 0.7083333 0.6979167 0.6354167 0.7812500 0.8333333 0.8958333
+##  [953] 0.8333333 0.7604167 0.6041667 0.8229167 0.8437500 0.7604167 0.8541667
+##  [960] 0.6562500 0.8958333 0.9166667 0.5625000 0.8020833 0.7708333 0.7708333
+##  [967] 0.7812500 0.7187500 0.7708333 0.8125000 0.8229167 0.8333333 0.6875000
+##  [974] 0.7604167 0.8125000 0.7916667 0.5520833 0.6770833 0.7812500 0.7812500
+##  [981] 0.6562500 0.6562500 0.5937500 0.7812500 0.7604167 0.6562500 0.8750000
+##  [988] 0.8541667 0.8958333 0.6458333 0.6562500 0.8125000 0.7291667 0.7307692
+##  [995] 0.8125000 0.8541667 0.9166667 0.6250000 0.7083333 0.8333333 0.7708333
+## [1002] 0.7500000 0.8437500 0.8333333 0.6562500 0.6875000 0.6875000 0.8854167
+## [1009] 0.7708333 0.6979167 0.7291667 0.8645833 0.7187500 0.8229167 0.7187500
+## [1016] 0.6770833 0.7916667 0.8020833 0.8645833 0.7916667 0.7291667 0.7604167
+## [1023] 0.7916667 0.7500000 0.7812500 0.8229167 0.8645833 0.6875000 0.6875000
+## [1030] 0.8854167 0.8541667 0.7395833 0.7083333 0.6250000 0.5567010 0.7812500
+## [1037] 0.7916667 0.6875000 0.7291667 0.7835052 0.8229167 0.5937500 0.7291667
+## [1044] 0.7938144 0.8645833 0.7708333 0.7916667 0.7422680 0.6666667 0.7395833
+## [1051] 0.8645833 0.6875000 0.8437500 0.6250000 0.7319588 0.6875000 0.5306122
+## [1058] 0.5625000 0.7187500 0.6979167 0.8125000 0.9062500 0.6875000 0.8125000
+## [1065] 0.7500000 0.8333333 0.7604167 0.8125000 0.8437500 0.7187500 0.6354167
+## [1072] 0.7604167 0.7395833 0.9175258 0.7216495 0.7187500 0.6979167 0.7395833
+## [1079] 0.7187500 0.8020833 0.8645833 0.6354167 0.8333333 0.7187500 0.8125000
+## [1086] 0.7812500 0.7708333 0.8229167 0.8229167 0.7291667 0.8437500 0.5520833
+## [1093] 0.9583333 0.8020833 0.7916667 0.8854167 0.7187500 0.8854167 0.6979167
+## [1100] 0.8958333 0.9270833 0.8437500 0.7708333 0.7083333 0.7291667 0.8020833
+## [1107] 0.7500000 0.7812500 0.6770833 0.7812500 0.7500000 0.7916667 0.6666667
+## [1114] 0.8437500 0.7604167 0.8541667 0.7187500 0.6770833 0.8750000 0.8958333
+## [1121] 0.7916667 0.7291667 0.8541667 0.6354167 0.5816327 0.7083333 0.6041667
+## [1128] 0.8125000 0.6354167 0.7812500 0.6250000 0.7708333 0.7422680 0.7916667
+## [1135] 0.7395833 0.7812500 0.8125000 0.9166667 0.7812500 0.8645833 0.6875000
+## [1142] 0.8854167 0.7500000 0.6979167 0.8958333 0.7604167 0.8333333 0.7187500
+## [1149] 0.8229167 0.7395833 0.8437500 0.7812500 0.7708333 0.8958333 0.7916667
+## [1156] 0.7708333 0.6458333 0.8020833 0.7916667 0.8645833 0.8229167 0.8333333
+## [1163] 0.7187500 0.8437500 0.8229167 0.7525773 0.8125000 0.7395833 0.7916667
+## [1170] 0.6041667 0.7187500 0.7708333 0.7938144 0.7708333 0.7113402 0.8854167
+## [1177] 0.7083333 0.7604167 0.7083333 0.8020833 0.7604167 0.7812500 0.6458333
+## [1184] 0.7083333 0.6041667 0.9062500 0.7916667 0.5937500 0.6354167 0.8125000
+## [1191] 0.8333333 0.6666667 0.8854167 0.7216495 0.7083333 0.8229167 0.8247423
+## [1198] 0.8958333 0.7812500 0.8854167 0.8750000 0.8125000 0.8958333 0.7395833
+## [1205] 0.6562500 0.8333333 0.7083333 0.7500000 0.8854167 0.9166667 0.7187500
+## [1212] 0.7291667 0.7604167 0.6666667 0.6562500 0.8333333 0.6979167 0.7525773
+## [1219] 0.8125000 0.7500000 0.7604167 0.8229167 0.7708333 0.7395833 0.8541667
+## [1226] 0.7187500 0.6666667 0.7500000 0.7083333 0.7422680 0.8020833 0.6458333
+## [1233] 0.7187500 0.7708333 0.8437500 0.6666667 0.8750000 0.6041667 0.6979167
+## [1240] 0.6666667 0.9062500 0.7812500 0.8541667 0.9062500 0.6041667 0.8437500
+## [1247] 0.6597938 0.8958333 0.7500000 0.7500000 0.8541667 0.7916667 0.7500000
+## [1254] 0.5937500 0.8229167 0.8437500 0.8125000 0.7916667 0.7604167 0.6875000
+## [1261] 0.6562500 0.9166667 0.7708333 0.8750000 0.7812500 0.5416667 0.8229167
+## [1268] 0.8437500 0.8645833 0.7083333 0.7500000 0.8958333 0.7500000 0.7187500
+## [1275] 0.7812500 0.7812500 0.6979167 0.8333333 0.7708333 0.8541667 0.7395833
+## [1282] 0.7916667 0.8854167 0.8541667 0.8854167 0.5520833 0.8125000 0.6458333
+## [1289] 0.6354167 0.7604167 0.8229167 0.6494845 0.8854167 0.8333333 0.8229167
+## [1296] 0.7604167 0.6666667 0.8854167 0.8020833 0.7291667 0.8125000 0.6979167
+## [1303] 0.7916667 0.7812500 0.8333333 0.7812500 0.6804124 0.7187500 0.7187500
+## [1310] 0.7708333 0.8750000 0.6562500 0.7812500 0.8229167 0.7525773 0.6875000
+## [1317] 0.8645833 0.7187500 0.6666667 0.6979167 0.7812500 0.8333333 0.7187500
+## [1324] 0.6666667 0.7812500 0.6562500 0.7708333 0.7395833 0.7291667 0.7395833
+## [1331] 0.8020833 0.8229167 0.7916667 0.8645833 0.8333333 0.9062500 0.7708333
+## [1338] 0.8437500 0.7187500 0.7916667 0.8333333 0.8125000 0.8229167 0.6145833
+## [1345] 0.7708333 0.8958333 0.8020833 0.8750000 0.7604167 0.7604167 0.7812500
+## [1352] 0.7187500 0.8020833 0.7916667 0.6250000 0.6875000 0.7187500 0.8854167
+## [1359] 0.6458333 0.8125000 0.5625000 0.8645833 0.8020833 0.6458333 0.7083333
+## [1366] 0.7291667 0.7708333 0.9166667 0.7916667 0.7604167 0.6770833 0.6770833
+## [1373] 0.7916667 0.6770833 0.7291667 0.8125000 0.7500000 0.7291667 0.7916667
+## [1380] 0.7628866 0.8020833 0.8958333 0.8969072 0.7187500 0.8854167 0.7916667
+## [1387] 0.8020833 0.8125000 0.7291667 0.8437500 0.8125000 0.5312500 0.8854167
+## [1394] 0.7083333 0.7812500 0.9270833 0.7083333 0.7291667 0.6666667 0.7604167
+## [1401] 0.8645833 0.7812500 0.8750000 0.7708333 0.6562500 0.8958333 0.8750000
+## [1408] 0.7916667 0.6770833 0.7916667 0.7187500 0.8541667 0.8333333 0.8125000
+## [1415] 0.7083333 0.6458333 0.8958333 0.7812500 0.7812500 0.8125000 0.8125000
+## [1422] 0.6562500 0.7500000 0.5520833 0.8750000 0.7916667 0.7812500 0.7395833
+## [1429] 0.7916667 0.6979167 0.7083333 0.8229167 0.8020833 0.8333333 0.7812500
+## [1436] 0.8125000 0.8437500 0.8645833 0.6875000 0.7291667 0.6458333 0.6979167
+## [1443] 0.8958333 0.8125000 0.8645833 0.6354167 0.8958333 0.7395833 0.7422680
+## [1450] 0.8645833 0.7500000 0.8750000 0.7083333 0.6979167 0.8229167 0.6796117
+## [1457] 0.7628866 0.7916667 0.7083333 0.7500000 0.7083333 0.8333333 0.7731959
+## [1464] 0.7708333 0.6875000 0.8958333 0.6979167 0.7187500 0.7500000 0.8125000
+## [1471] 0.8750000 0.7395833 0.8437500 0.6979167 0.5520833 0.5520833 0.7395833
+## [1478] 0.7187500 0.8229167 0.8958333 0.8750000 0.6979167 0.7291667 0.7291667
+## [1485] 0.6770833 0.6875000 0.7187500 0.7916667 0.6979167 0.8229167 0.6770833
+## [1492] 0.7812500 0.6458333 0.7422680 0.8229167 0.7812500 0.8020833 0.7708333
+## [1499] 0.7604167 0.8854167 0.7395833 0.8333333 0.6875000 0.7708333 0.7812500
+## [1506] 0.8750000 0.8645833 0.6562500 0.9375000 0.5625000 0.8645833 0.8437500
+## [1513] 0.8541667 0.8645833 0.8333333 0.6770833 0.8333333 0.7708333 0.8125000
+## [1520] 0.7395833 0.8125000 0.9270833 0.8541667 0.8229167 0.5416667 0.7916667
+## [1527] 0.8229167 0.5104167 0.5833333 0.7708333 0.8541667 0.8144330 0.7113402
+## [1534] 0.9062500 0.8958333 0.8333333 0.7604167 0.8125000 0.8020833 0.7291667
+## [1541] 0.8125000 0.7916667 0.6875000 0.7604167 0.8645833 0.8645833 0.7916667
+## [1548] 0.6562500 0.8750000 0.7083333 0.6391753 0.7187500 0.6875000 0.8125000
+## [1555] 0.6875000 0.6666667 0.7500000 0.9166667 0.8229167 0.6666667 0.6250000
+## [1562] 0.7395833 0.7812500 0.6458333 0.8333333 0.7812500 0.7708333 0.8144330
+## [1569] 0.7812500 0.7395833 0.7500000 0.8437500 0.5312500 0.5625000 0.8333333
+## [1576] 0.5625000 0.8333333 0.8645833 0.7812500 0.8229167 0.5104167 0.8541667
+## [1583] 0.7083333 0.7708333 0.5312500 0.8541667 0.7187500 0.6875000 0.7812500
+## [1590] 0.9062500 0.7500000 0.5625000 0.8020833 0.6562500 0.7708333 0.6770833
+## [1597] 0.6979167 0.8229167 0.7395833 0.8437500 0.8437500 0.8125000 0.8854167
+## [1604] 0.6666667 0.8437500 0.6145833 0.8437500 0.7604167 0.7812500 0.7604167
+## [1611] 0.7708333 0.8958333 0.6979167 0.7916667 0.7812500 0.8750000 0.7395833
+## [1618] 0.5625000 0.6562500 0.8229167 0.6354167 0.6979167 0.8333333 0.9062500
+## [1625] 0.6458333 0.8125000 0.7500000 0.8750000 0.9375000 0.8020833 0.8958333
+## [1632] 0.8437500 0.8854167 0.6597938 0.7500000 0.8020833 0.9166667 0.6041667
+## [1639] 0.9270833 0.8125000 0.8958333 0.5000000 0.8020833 0.8020833 0.8854167
+## [1646] 0.6979167 0.5979381 0.8958333 0.8958333 0.7812500 0.7010309 0.5312500
+## [1653] 0.7916667 0.6979167 0.8125000 0.8333333 0.8958333 0.7187500 0.5416667
+## [1660] 0.7916667 0.9062500 0.6979167 0.7395833 0.5416667 0.6458333 0.8020833
+## [1667] 0.6145833 0.7812500 0.6770833 0.6875000 0.8437500 0.5520833 0.7083333
+## [1674] 0.8854167 0.6770833 0.7604167 0.7938144 0.6875000 0.7916667 0.7916667
+## [1681] 0.7708333 0.7551020 0.8229167 0.8541667 0.6562500 0.6770833 0.6770833
+## [1688] 0.5625000 0.8645833 0.7291667 0.6979167 0.7812500 0.7812500 0.8229167
+## [1695] 0.8645833 0.7291667 0.8020833 0.7083333 0.5833333 0.6770833 0.8854167
+## [1702] 0.8125000 0.7187500 0.6354167 0.7812500 0.7083333 0.7916667 0.8958333
+## [1709] 0.8020833 0.7422680 0.8333333 0.9062500 0.6458333 0.6354167 0.8645833
+## [1716] 0.7916667 0.8020833 0.8229167 0.6979167 0.8020833 0.7708333 0.7812500
+## [1723] 0.7708333 0.7500000 0.7395833 0.5625000 0.8750000 0.7291667 0.7916667
+## [1730] 0.7916667 0.6354167 0.8229167 0.8645833 0.6875000 0.8854167 0.8645833
+## [1737] 0.6458333 0.7916667 0.5416667 0.6875000 0.7916667 0.6250000 0.7500000
+## [1744] 0.8437500 0.6666667 0.6494845 0.7604167 0.6041667 0.8750000 0.7187500
+## [1751] 0.8229167 0.7500000 0.8854167 0.8333333 0.7291667 0.5312500 0.7938144
+## [1758] 0.6666667 0.7187500 0.7628866 0.7708333 0.7812500 0.8020833 0.7216495
+## [1765] 0.8437500 0.8020833 0.6875000 0.7291667 0.6354167 0.8125000 0.5312500
+## [1772] 0.7500000 0.6770833 0.7812500 0.7187500 0.7083333 0.8333333 0.8020833
+## [1779] 0.6979167 0.8541667 0.7916667 0.7938144 0.8020833 0.8437500 0.7291667
+## [1786] 0.8125000 0.7187500 0.8958333 0.5312500 0.6666667 0.8541667 0.6875000
+## [1793] 0.6145833 0.7628866 0.8645833 0.7604167 0.6666667 0.6458333 0.7187500
+## [1800] 0.8229167 0.7500000 0.8125000 0.6770833 0.7187500 0.6979167 0.5520833
+## [1807] 0.7187500 0.7187500 0.7812500 0.7604167 0.6562500 0.8333333 0.8229167
+## [1814] 0.5312500 0.8645833 0.7083333 0.7708333 0.8333333 0.7244898 0.9166667
+## [1821] 0.8750000 0.6041667 0.8333333 0.7676768 0.6907216 0.7291667 0.8541667
+## [1828] 0.7604167 0.6145833 0.6770833 0.8541667 0.7291667 0.6875000 0.7812500
+## [1835] 0.6979167 0.9062500 0.5729167 0.8645833 0.6250000 0.6875000 0.7916667
+## [1842] 0.7916667 0.7500000 0.7187500 0.7812500 0.7812500 0.6979167 0.7395833
+## [1849] 0.7500000 0.8229167 0.7916667 0.8645833 0.7500000 0.6875000 0.7395833
+## [1856] 0.7938144 0.9270833 0.6979167 0.8020833 0.5312500 0.7500000 0.8020833
+## [1863] 0.6979167 0.8541667 0.7916667 0.7291667 0.8750000 0.7812500 0.9062500
+## [1870] 0.7708333 0.7395833 0.6770833 0.8645833 0.8541667 0.7708333 0.8333333
+## [1877] 0.8958333 0.7812500 0.7187500 0.9166667 0.7916667 0.8437500 0.6875000
+## [1884] 0.7187500 0.7187500 0.7113402 0.5937500 0.7291667 0.8750000 0.7916667
+## [1891] 0.8645833 0.7010309 0.8969072 0.7916667 0.7083333 0.8750000 0.8125000
+## [1898] 0.7916667 0.8645833 0.8020833 0.6145833 0.8229167 0.9062500 0.8645833
+## [1905] 0.7916667 0.8541667 0.7395833 0.8125000 0.6562500 0.6770833 0.8229167
+## [1912] 0.7291667 0.7083333 0.8229167 0.6666667 0.7916667 0.5625000 0.6770833
+## [1919] 0.8125000 0.5312500 0.8437500 0.7812500 0.8229167 0.8350515 0.8854167
+## [1926] 0.7604167 0.6041667 0.6041667 0.6041667 0.8854167 0.7916667 0.7812500
+## [1933] 0.7500000 0.7291667 0.6562500 0.7812500 0.7395833 0.8125000 0.6979167
+## [1940] 0.7835052 0.7708333 0.7916667 0.7187500 0.7291667 0.7083333 0.6354167
+## [1947] 0.9175258 0.7187500 0.7187500 0.7500000 0.7187500 0.7916667 0.5937500
+## [1954] 0.7291667 0.8125000 0.7812500 0.5900000 0.9062500 0.7319588 0.7708333
+## [1961] 0.8854167 0.8125000 0.7916667 0.8750000 0.8125000 0.7291667 0.7083333
+## [1968] 0.6666667 0.7500000 0.9375000 0.7812500 0.7857143 0.7916667 0.6666667
+## [1975] 0.8958333 0.7812500 0.6666667 0.7291667 0.8350515 0.8020833 0.6494845
+## [1982] 0.7291667 0.7500000 0.6354167 0.7731959 0.8437500 0.7291667 0.8645833
+## [1989] 0.6770833 0.8750000 0.7731959 0.8958333 0.8958333 0.8437500 0.7731959
+## [1996] 0.8750000 0.9375000 0.6770833 0.7812500 0.7395833 0.7083333 0.6562500
+## [2003] 0.7083333 0.7395833 0.7010309 0.8541667 0.7083333 0.6562500 0.6770833
+## [2010] 0.9175258 0.7500000 0.8020833 0.6770833 0.8020833 0.8437500 0.6875000
+## [2017] 0.8333333 0.7187500 0.7083333 0.8437500 0.8229167 0.6770833 0.7395833
+## [2024] 0.7916667 0.7708333 0.6875000 0.8229167 0.6354167 0.8645833 0.5625000
+## [2031] 0.7291667 0.7938144 0.7291667 0.9062500 0.6666667 0.8125000 0.6145833
+## [2038] 0.8437500 0.8229167 0.8350515 0.7395833 0.6354167 0.8437500 0.5416667
+## [2045] 0.6979167 0.7604167 0.7708333 0.6770833 0.7500000 0.7812500 0.6250000
+## [2052] 0.7916667 0.9062500 0.6041667 0.7812500 0.9062500 0.6979167 0.6041667
+## [2059] 0.6770833 0.6875000 0.6875000 0.6979167 0.7395833 0.8958333 0.9270833
+## [2066] 0.8437500 0.7812500 0.8020833 0.8229167 0.8229167 0.7010309 0.8229167
+## [2073] 0.8020833 0.6979167 0.7083333 0.8229167 0.9375000 0.7500000 0.6666667
+## [2080] 0.7500000 0.7291667 0.7187500 0.7604167 0.7916667 0.6979167 0.9062500
+## [2087] 0.7187500 0.7083333 0.6666667 0.6354167 0.6979167 0.6875000 0.7395833
+## [2094] 0.5729167 0.7500000 0.8125000 0.8437500 0.7708333 0.6391753 0.7812500
+## [2101] 0.6250000 0.8854167 0.7083333 0.6145833 0.8645833 0.6666667 0.7083333
+## [2108] 0.7187500 0.8437500 0.6979167 0.7916667 0.5625000 0.6666667 0.8020833
+## [2115] 0.8437500 0.8541667 0.8125000 0.9278351 0.7604167 0.8541667 0.7604167
+## [2122] 0.8020833 0.6979167 0.7916667 0.7083333 0.8541667 0.8541667 0.6979167
+## [2129] 0.7708333 0.6701031 0.5833333 0.7604167 0.7216495 0.7708333 0.6458333
+## [2136] 0.7916667 0.7083333 0.6979167 0.7916667 0.7083333 0.7812500 0.9270833
+## [2143] 0.6145833 0.7187500 0.7395833 0.8541667 0.7083333 0.8333333 0.7422680
+## [2150] 0.7812500 0.5937500 0.7395833 0.6041667 0.8453608 0.8333333 0.7395833
+## [2157] 0.8333333 0.7113402 0.7187500 0.8541667 0.8020833 0.8125000 0.8541667
+## [2164] 0.7291667 0.8437500 0.6734694 0.9270833 0.8229167 0.9062500 0.6666667
+## [2171] 0.6354167 0.5937500 0.7916667 0.7395833 0.8645833 0.7916667 0.6875000
+## [2178] 0.8229167 0.8229167 0.8333333 0.6354167 0.6666667 0.8958333 0.7422680
+## [2185] 0.6250000 0.8125000 0.7604167 0.7604167 0.7083333 0.8854167 0.8020833
+## [2192] 0.7395833 0.8854167 0.7291667 0.8333333 0.6770833 0.7604167 0.7395833
+## [2199] 0.6979167 0.7604167 0.7916667 0.8020833 0.7812500 0.6770833 0.8541667
+## [2206] 0.7708333 0.7708333 0.6041667 0.7395833 0.7291667 0.8020833 0.8020833
+## [2213] 0.7291667 0.6458333 0.6458333 0.6562500 0.6770833 0.8229167 0.7812500
+## [2220] 0.6562500 0.6407767 0.8020833 0.6250000 0.8958333 0.6770833 0.6562500
+## [2227] 0.7916667 0.7500000 0.6666667 0.5208333 0.7395833 0.5729167 0.7083333
+## [2234] 0.8333333 0.5520833 0.7083333 0.5729167 0.7083333 0.6250000 0.7395833
+## [2241] 0.8125000 0.8333333 0.6562500 0.7187500 0.7812500 0.7604167 0.6250000
+## [2248] 0.6458333 0.8541667 0.6979167 0.8645833 0.7708333 0.5729167 0.6666667
+## [2255] 0.6770833 0.6979167 0.7604167 0.6354167 0.7395833 0.7395833 0.7812500
+## [2262] 0.8958333 0.8333333 0.7916667 0.7291667 0.6041667 0.7708333 0.6979167
+## [2269] 0.7916667 0.6979167 0.6250000 0.7604167 0.7604167 0.6250000 0.7604167
+## [2276] 0.7500000 0.6041667 0.5312500 0.5312500 0.6979167 0.8333333 0.6875000
+## [2283] 0.6979167 0.7500000 0.7187500 0.6041667 0.8541667 0.7916667 0.7187500
+## [2290] 0.7500000 0.6354167 0.7395833 0.6041667 0.8020833 0.7628866 0.7812500
+## [2297] 0.7500000 0.6666667 0.6458333 0.8229167 0.6562500 0.7500000 0.7812500
+## [2304] 0.5833333 0.7604167 0.7395833 0.7812500 0.7142857 0.6666667 0.6145833
+## [2311] 0.7083333 0.7812500 0.8333333 0.7812500 0.7083333 0.6666667 0.6770833
+## [2318] 0.6562500 0.7525773 0.7500000 0.6875000 0.7708333 0.8437500 0.7708333
+## [2325] 0.6875000 0.7708333 0.5208333 0.7812500 0.7319588 0.7395833 0.5729167
+## [2332] 0.7812500 0.7395833 0.7500000 0.8958333 0.8125000 0.7916667 0.6979167
+## [2339] 0.6041667 0.6875000 0.7916667 0.7604167 0.6354167 0.7500000 0.7187500
+## [2346] 0.7500000 0.7708333 0.7708333 0.7708333 0.6458333 0.7500000 0.6458333
+## [2353] 0.7500000 0.7291667 0.6250000 0.5416667 0.7291667 0.4895833 0.6250000
+## [2360] 0.7604167 0.7040816 0.5625000 0.5520833 0.7395833 0.7187500 0.5670103
+## [2367] 0.7187500 0.7291667 0.8437500 0.8020833 0.6875000 0.7604167 0.7604167
+## [2374] 0.7187500 0.5520833 0.5520833 0.8125000 0.6458333 0.5625000 0.5729167
+## [2381] 0.6907216 0.6875000 0.8854167 0.6907216 0.6041667 0.7708333 0.7604167
+## [2388] 0.7083333 0.7395833 0.7708333 0.6770833 0.5208333 0.6458333 0.7083333
+## [2395] 0.6562500 0.6979167 0.7604167 0.7812500 0.7812500 0.7812500 0.6145833
+## [2402] 0.5520833 0.6041667 0.7291667 0.7083333 0.6597938 0.7916667 0.6145833
+## [2409] 0.5208333 0.7187500 0.8541667 0.6250000 0.7708333 0.9278351 0.5000000
+## [2416] 0.5625000 0.7812500 0.8645833 0.8125000 0.6875000 0.7291667 0.7291667
+## [2423] 0.9270833 0.8333333 0.5520833 0.7291667 0.8541667 0.8020833 0.7604167
+## [2430] 0.7187500 0.8125000 0.7604167 0.7083333 0.6666667 0.5625000 0.7291667
+## [2437] 0.5729167 0.7812500 0.6354167 0.6979167 0.6979167 0.5520833 0.7812500
+## [2444] 0.6979167 0.7187500 0.6770833 0.7916667 0.8854167 0.7812500 0.6938776
+## [2451] 0.7812500 0.6979167 0.6458333 0.7083333 0.6354167 0.7187500 0.5937500
+## [2458] 0.6562500 0.7812500 0.6145833 0.6770833 0.6354167 0.6770833 0.7604167
+## [2465] 0.7708333 0.6562500 0.6354167 0.7187500 0.6562500 0.5876289 0.6875000
+## [2472] 0.7187500 0.7938144 0.7604167 0.8958333 0.8020833 0.7916667 0.7812500
+## [2479] 0.7291667 0.7604167 0.8020833 0.7604167 0.5520833 0.6875000 0.8020833
+## [2486] 0.7187500 0.6250000 0.6666667 0.8854167 0.6979167 0.4791667 0.6979167
+## [2493] 0.6354167 0.6458333 0.7812500 0.7500000 0.6875000 0.6666667 0.7083333
+## [2500] 0.5625000 0.6562500 0.7812500 0.8125000 0.5520833 0.6875000 0.5625000
+## [2507] 0.8750000 0.5416667 0.5104167 0.8125000 0.6458333 0.5520833 0.7187500
+## [2514] 0.7604167 0.6979167 0.7604167 0.6458333 0.7291667 0.8020833 0.8333333
+## [2521] 0.7916667 0.8229167 0.6354167 0.8125000 0.7395833 0.7708333 0.5625000
+## [2528] 0.6979167 0.7083333 0.5729167 0.5520833 0.7083333 0.8437500 0.8854167
+## [2535] 0.7083333 0.7604167 0.7812500 0.8333333 0.6666667 0.7916667 0.8229167
+## [2542] 0.5520833 0.7604167 0.7812500 0.6875000 0.8020833 0.5729167 0.5520833
+## [2549] 0.8958333 0.7083333 0.7083333 0.7395833 0.7291667 0.8229167 0.7291667
+## [2556] 0.6354167 0.7395833 0.6354167 0.8125000 0.7604167 0.5729167 0.7708333
+## [2563] 0.7835052 0.8958333 0.5937500 0.8333333 0.8229167 0.5833333 0.7113402
+## [2570] 0.7395833 0.5520833 0.6764706 0.7083333 0.6875000 0.8854167 0.5520833
+## [2577] 0.5833333 0.7604167 0.7187500 0.5937500 0.7291667 0.5520833 0.7916667
+## [2584] 0.7040816 0.6354167 0.7083333 0.5833333 0.8437500 0.6734694 0.6666667
+## [2591] 0.7708333 0.6458333 0.7916667 0.5520833 0.5833333 0.6770833 0.7812500
+## [2598] 0.5833333 0.7500000 0.7346939 0.6145833 0.6354167 0.6875000 0.8125000
+## [2605] 0.5520833 0.7604167 0.5625000 0.7083333 0.6666667 0.6979167 0.7500000
+## [2612] 0.6354167 0.7604167 0.7604167 0.6875000 0.8229167 0.8020833 0.5463918
+## [2619] 0.7395833 0.5625000 0.7812500 0.5416667 0.6666667 0.6458333 0.6770833
+## [2626] 0.7187500 0.5833333 0.6562500 0.7395833 0.8020833 0.6562500 0.7916667
+## [2633] 0.5625000 0.8645833 0.5520833 0.6666667 0.6979167 0.7604167 0.7395833
+## [2640] 0.5625000 0.7291667 0.6145833 0.7604167 0.6875000 0.5520833 0.8125000
+## [2647] 0.7500000 0.5416667 0.8229167 0.8041237 0.7708333 0.7187500 0.8958333
+## [2654] 0.8437500 0.6041667 0.7395833 0.6770833 0.5520833 0.7916667 0.8125000
+## [2661] 0.7604167 0.7812500 0.5520833 0.8437500 0.7708333 0.7812500 0.6666667
+## [2668] 0.6562500 0.6875000 0.7319588 0.8541667 0.7604167 0.7187500 0.5416667
+## [2675] 0.7500000 0.6354167 0.6354167 0.7500000 0.6875000 0.8645833 0.8020833
+## [2682] 0.7916667 0.6875000 0.7500000 0.5833333 0.6354167 0.8229167 0.6458333
+## [2689] 0.6250000 0.6562500 0.7812500 0.6979167 0.6354167 0.6562500 0.8333333
+## [2696] 0.7812500 0.7604167 0.6979167 0.7604167 0.7916667 0.7812500 0.6770833
+## [2703] 0.6979167 0.5833333 0.6041667 0.8333333 0.6875000 0.5104167 0.5979381
+## [2710] 0.7500000 0.8229167 0.5833333 0.7604167 0.7812500 0.5520833 0.7187500
+## [2717] 0.7500000 0.6875000 0.5833333 0.7916667 0.6145833 0.7083333 0.8041237
+## [2724] 0.7083333 0.7373737 0.6666667 0.8020833 0.7500000 0.7857143 0.6562500
+## [2731] 0.6597938 0.7916667 0.8333333 0.7708333 0.6979167 0.6979167 0.6041667
+## [2738] 0.7500000 0.6145833 0.6979167 0.8229167 0.7187500 0.5625000 0.7500000
+## [2745] 0.7395833 0.7500000 0.7395833 0.8000000 0.7708333 0.6458333 0.8333333
+## [2752] 0.6666667 0.7500000 0.7916667 0.7291667 0.8541667 0.6288660 0.8437500
+## [2759] 0.6875000
+## Levels: 1 2 3
 ```
 
 ```r
@@ -2042,8 +2068,8 @@ head(prk)
 ```
 
 ```
-## [1] 0 0 0 0 0 0
-## Levels: 0 1 2
+## [1] 1 1 1 1 1 1
+## Levels: 1 2 3
 ```
 
 ```r
@@ -2051,7 +2077,7 @@ head(prk.prob)
 ```
 
 ```
-## [1] 0.7083333 0.8333333 0.7604167 0.8333333 0.6562500 0.6770833
+## [1] 0.6979167 0.7500000 0.8437500 0.7500000 0.8333333 0.8645833
 ```
 
 ```r
@@ -2065,8 +2091,6 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)
 ##    Cell Contents
 ## |-------------------------|
 ## |                       N |
-## |           N / Row Total |
-## |           N / Col Total |
 ## |         N / Table Total |
 ## |-------------------------|
 ## 
@@ -2075,26 +2099,19 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)
 ## 
 ##  
 ##                         | prk 
-## ds_asses1_test_category |         0 |         2 | Row Total | 
-## ------------------------|-----------|-----------|-----------|
-##                       0 |      1990 |         0 |      1990 | 
-##                         |     1.000 |     0.000 |     0.721 | 
-##                         |     0.722 |     0.000 |           | 
-##                         |     0.721 |     0.000 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       1 |       266 |         0 |       266 | 
-##                         |     1.000 |     0.000 |     0.096 | 
-##                         |     0.096 |     0.000 |           | 
-##                         |     0.096 |     0.000 |           | 
-## ------------------------|-----------|-----------|-----------|
-##                       2 |       501 |         2 |       503 | 
-##                         |     0.996 |     0.004 |     0.182 | 
-##                         |     0.182 |     1.000 |           | 
-##                         |     0.182 |     0.001 |           | 
-## ------------------------|-----------|-----------|-----------|
-##            Column Total |      2757 |         2 |      2759 | 
-##                         |     0.999 |     0.001 |           | 
-## ------------------------|-----------|-----------|-----------|
+## ds_asses1_test_category |         1 | Row Total | 
+## ------------------------|-----------|-----------|
+##                       1 |      2016 |      2016 | 
+##                         |     0.731 |           | 
+## ------------------------|-----------|-----------|
+##                       2 |       237 |       237 | 
+##                         |     0.086 |           | 
+## ------------------------|-----------|-----------|
+##                       3 |       506 |       506 | 
+##                         |     0.183 |           | 
+## ------------------------|-----------|-----------|
+##            Column Total |      2759 |      2759 | 
+## ------------------------|-----------|-----------|
 ## 
 ## 
 ```
@@ -2107,10 +2124,10 @@ CrossTable(x = ds_asses1_test_category, y = prk, prop.chisq=FALSE)
 
 ```
 ##    ds_asses1_test_category
-## prk    0    1    2
-##   0 1990  266  501
-##   1    0    0    0
-##   2    0    0    2
+## prk    1    2    3
+##   1 2016  237  506
+##   2    0    0    0
+##   3    0    0    0
 ```
 
 ```r
@@ -2122,33 +2139,33 @@ library(caret)
 ## Confusion Matrix and Statistics
 ## 
 ##    ds_asses1_test_category
-## prk    0    1    2
-##   0 1990  266  501
-##   1    0    0    0
-##   2    0    0    2
+## prk    1    2    3
+##   1 2016  237  506
+##   2    0    0    0
+##   3    0    0    0
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.722           
-##                  95% CI : (0.7049, 0.7387)
-##     No Information Rate : 0.7213          
-##     P-Value [Acc > NIR] : 0.4759          
+##                Accuracy : 0.7307          
+##                  95% CI : (0.7137, 0.7472)
+##     No Information Rate : 0.7307          
+##     P-Value [Acc > NIR] : 0.5099          
 ##                                           
-##                   Kappa : 0.004           
+##                   Kappa : 0               
 ##                                           
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
-##                      Class: 0 Class: 1  Class: 2
-## Sensitivity          1.000000  0.00000 0.0039761
-## Specificity          0.002601  1.00000 1.0000000
-## Pos Pred Value       0.721799      NaN 1.0000000
-## Neg Pred Value       1.000000  0.90359 0.8182807
-## Prevalence           0.721276  0.09641 0.1823124
-## Detection Rate       0.721276  0.00000 0.0007249
-## Detection Prevalence 0.999275  0.00000 0.0007249
-## Balanced Accuracy    0.501300  0.50000 0.5019881
+##                      Class: 1 Class: 2 Class: 3
+## Sensitivity            1.0000   0.0000   0.0000
+## Specificity            0.0000   1.0000   1.0000
+## Pos Pred Value         0.7307      NaN      NaN
+## Neg Pred Value            NaN   0.9141   0.8166
+## Prevalence             0.7307   0.0859   0.1834
+## Detection Rate         0.7307   0.0000   0.0000
+## Detection Prevalence   1.0000   0.0000   0.0000
+## Balanced Accuracy      0.5000   0.5000   0.5000
 ```
 
 ```r
@@ -2160,7 +2177,7 @@ library(caret)
 ```
 
 ```
-## [1] 72.20007
+## [1] 73.06995
 ```
 
 ```r
@@ -2177,102 +2194,102 @@ k=i
 ```
 
 ```
-## 1 = 66.07466 
-## 2 = 65.53099 
-## 3 = 69.04676 
-## 4 = 69.73541 
-## 5 = 70.67778 
-## 6 = 70.89525 
-## 7 = 71.9826 
-## 8 = 71.6564 
-## 9 = 71.9826 
-## 10 = 71.94636 
-## 11 = 71.80138 
-## 12 = 71.87387 
-## 13 = 71.87387 
-## 14 = 71.72889 
-## 15 = 71.76513 
-## 16 = 71.80138 
-## 17 = 71.69264 
-## 18 = 71.91011 
-## 19 = 72.05509 
-## 20 = 72.01885 
-## 21 = 71.94636 
-## 22 = 72.27256 
-## 23 = 72.16383 
-## 24 = 72.12758 
-## 25 = 72.27256 
-## 26 = 72.27256 
-## 27 = 72.23632 
-## 28 = 72.27256 
-## 29 = 72.09134 
-## 30 = 72.09134 
-## 31 = 72.16383 
-## 32 = 72.23632 
-## 33 = 72.34505 
-## 34 = 72.23632 
-## 35 = 72.3813 
-## 36 = 72.41754 
-## 37 = 72.3813 
-## 38 = 72.34505 
-## 39 = 72.34505 
-## 40 = 72.34505 
-## 41 = 72.30881 
-## 42 = 72.27256 
-## 43 = 72.27256 
-## 44 = 72.27256 
-## 45 = 72.23632 
-## 46 = 72.23632 
-## 47 = 72.23632 
-## 48 = 72.23632 
-## 49 = 72.20007 
-## 50 = 72.16383 
-## 51 = 72.20007 
-## 52 = 72.16383 
-## 53 = 72.16383 
-## 54 = 72.20007 
-## 55 = 72.20007 
-## 56 = 72.27256 
-## 57 = 72.27256 
-## 58 = 72.27256 
-## 59 = 72.27256 
-## 60 = 72.23632 
-## 61 = 72.23632 
-## 62 = 72.27256 
-## 63 = 72.27256 
-## 64 = 72.23632 
-## 65 = 72.23632 
-## 66 = 72.23632 
-## 67 = 72.23632 
-## 68 = 72.23632 
-## 69 = 72.23632 
-## 70 = 72.23632 
-## 71 = 72.23632 
-## 72 = 72.23632 
-## 73 = 72.23632 
-## 74 = 72.23632 
-## 75 = 72.23632 
-## 76 = 72.23632 
-## 77 = 72.23632 
-## 78 = 72.23632 
-## 79 = 72.23632 
-## 80 = 72.23632 
-## 81 = 72.20007 
-## 82 = 72.20007 
-## 83 = 72.20007 
-## 84 = 72.20007 
-## 85 = 72.20007 
-## 86 = 72.20007 
-## 87 = 72.20007 
-## 88 = 72.20007 
-## 89 = 72.20007 
-## 90 = 72.20007 
-## 91 = 72.20007 
-## 92 = 72.20007 
-## 93 = 72.20007 
-## 94 = 72.20007 
-## 95 = 72.20007 
-## 96 = 72.20007
+## 1 = 65.4585 
+## 2 = 65.20478 
+## 3 = 70.60529 
+## 4 = 71.22146 
+## 5 = 72.23632 
+## 6 = 72.85248 
+## 7 = 73.03371 
+## 8 = 73.35991 
+## 9 = 72.77999 
+## 10 = 73.21493 
+## 11 = 73.25118 
+## 12 = 73.86734 
+## 13 = 73.68612 
+## 14 = 73.54114 
+## 15 = 73.64987 
+## 16 = 73.32367 
+## 17 = 73.32367 
+## 18 = 73.61363 
+## 19 = 73.50489 
+## 20 = 73.35991 
+## 21 = 73.46865 
+## 22 = 73.50489 
+## 23 = 73.50489 
+## 24 = 73.54114 
+## 25 = 73.50489 
+## 26 = 73.54114 
+## 27 = 73.46865 
+## 28 = 73.61363 
+## 29 = 73.46865 
+## 30 = 73.46865 
+## 31 = 73.32367 
+## 32 = 73.35991 
+## 33 = 73.4324 
+## 34 = 73.39616 
+## 35 = 73.4324 
+## 36 = 73.35991 
+## 37 = 73.28742 
+## 38 = 73.21493 
+## 39 = 73.21493 
+## 40 = 73.17869 
+## 41 = 73.17869 
+## 42 = 73.21493 
+## 43 = 73.17869 
+## 44 = 73.21493 
+## 45 = 73.21493 
+## 46 = 73.25118 
+## 47 = 73.25118 
+## 48 = 73.17869 
+## 49 = 73.25118 
+## 50 = 73.17869 
+## 51 = 73.17869 
+## 52 = 73.21493 
+## 53 = 73.17869 
+## 54 = 73.14244 
+## 55 = 73.21493 
+## 56 = 73.17869 
+## 57 = 73.17869 
+## 58 = 73.21493 
+## 59 = 73.17869 
+## 60 = 73.14244 
+## 61 = 73.14244 
+## 62 = 73.14244 
+## 63 = 73.14244 
+## 64 = 73.14244 
+## 65 = 73.14244 
+## 66 = 73.17869 
+## 67 = 73.17869 
+## 68 = 73.17869 
+## 69 = 73.17869 
+## 70 = 73.17869 
+## 71 = 73.14244 
+## 72 = 73.1062 
+## 73 = 73.1062 
+## 74 = 73.1062 
+## 75 = 73.1062 
+## 76 = 73.1062 
+## 77 = 73.1062 
+## 78 = 73.1062 
+## 79 = 73.1062 
+## 80 = 73.1062 
+## 81 = 73.1062 
+## 82 = 73.1062 
+## 83 = 73.1062 
+## 84 = 73.1062 
+## 85 = 73.1062 
+## 86 = 73.1062 
+## 87 = 73.1062 
+## 88 = 73.1062 
+## 89 = 73.1062 
+## 90 = 73.1062 
+## 91 = 73.1062 
+## 92 = 73.1062 
+## 93 = 73.1062 
+## 94 = 73.1062 
+## 95 = 73.06995 
+## 96 = 73.06995
 ```
 
 ```r
